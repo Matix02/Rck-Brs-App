@@ -26,6 +26,7 @@ public class ElementViewModel extends AndroidViewModel {
         elementRoomRepository.createElement(id, title, category, share, isWatched);
     }
 
+
     public void createElement(Element element) {
         elementRoomRepository.createElement(element);
     }

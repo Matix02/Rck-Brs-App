@@ -6,12 +6,20 @@ import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class ElementRoomRepository {
@@ -21,6 +29,9 @@ public class ElementRoomRepository {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
     private long rowIdOfTheItemInserted;
+
+    //Mój szajs
+    List<Element> elementList = new ArrayList<>();
 
     public ElementRoomRepository(Application application) {
         this.application = application;
@@ -32,11 +43,23 @@ public class ElementRoomRepository {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toObservable()
-                .subscribe(elements -> {
-                    Log.d("Bufor", " Elements " + elements.size() + " from Contructor");
-                    elementLiveData.postValue(elements);
-                }, throwable -> {
+                .flatMap((Function<List<Element>, Observable<Element>>) elements -> Observable.fromArray(elements.toArray(new Element[0])))
+                .filter(new Predicate<Element>() {
+                    @Override
+                    public boolean test(Element element) throws Exception {
+                        return element.getCategory().equals("Gra");
+                    }
+                })
+                .reduce(new ArrayList<Element>(), (elements, element) -> {
+                    Log.d("Bufor", "Reduce - Constructor");
+                    elements.add(element);
 
+                    elementLiveData.postValue(elements);
+                    return elements;
+                })
+                .subscribe(elements -> {
+                    Log.d("Bufor", "Subscribe - Constructor");
+                    elementLiveData.postValue(elements);
                 })
         );
     }
