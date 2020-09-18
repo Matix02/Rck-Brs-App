@@ -42,4 +42,6 @@ public class ElementViewModel extends AndroidViewModel {
     public void clear() {
         elementRoomRepository.clear();
     }
+
+    public void updateTrigger(long id, String title) { elementRoomRepository.updateElement(id, title); }
 }

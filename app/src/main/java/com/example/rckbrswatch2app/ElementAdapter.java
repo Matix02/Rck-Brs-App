@@ -39,6 +39,8 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
 
     public void setElementList(List<Element> elementList){
         this.elementList = elementList;
+
+
         notifyDataSetChanged();
     }
 

@@ -55,9 +55,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.filter:
-
-
-
+                elementViewModel.updateTrigger(5, "title");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

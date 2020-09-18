@@ -13,7 +13,7 @@ public class Element {
     private String category;
     private boolean isWatched;
 
-    Element() { }
+    Element() {}
 
     public Element(String title, String category, boolean isWatched, String share) {
         this.title = title;

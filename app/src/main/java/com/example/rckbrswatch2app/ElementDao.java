@@ -39,6 +39,12 @@ public interface ElementDao {
             "WHERE id =:Id")
     void updateElementById(long Id, String title, String recommendation, String cat);
 
+    @Query("UPDATE Element\n" +
+            "SET " +
+            "title =:title\n" +
+            "WHERE id =:Id")
+    void updateBlankElement(long Id, String title);
+
     @Query("select * from Element")
     Flowable<List<Element>> getElements();
 
