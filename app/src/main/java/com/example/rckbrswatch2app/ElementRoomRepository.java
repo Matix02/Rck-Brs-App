@@ -1,6 +1,7 @@
 package com.example.rckbrswatch2app;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ public class ElementRoomRepository {
     private long rowIdOfTheItemInserted;
 
     //Mój szajs
+
 
     public ElementRoomRepository(Application application) {
         this.application = application;

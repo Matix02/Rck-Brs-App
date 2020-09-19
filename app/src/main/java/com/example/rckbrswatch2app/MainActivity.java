@@ -1,23 +1,18 @@
 package com.example.rckbrswatch2app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.prefs.PreferenceChangeEvent;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
@@ -46,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Log.d("Bufor", "Boolean is " + s);
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        };
+        }
        /* Element element = new Element("title2", "Gra", false, "Rock");
         elementViewModel.createElement(element);*/
 
@@ -75,9 +70,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         Log.d("Bufor", "Byłem w OnSharedChangeListenr3");
-        boolean d = sharedPreferences.getBoolean("GameList", false);
-        Log.d("Bufor", "Boolean is " + d);
+
     }
+
     @Override
     protected void onResume() {
         super.onResume();

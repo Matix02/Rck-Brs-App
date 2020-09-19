@@ -1,5 +1,6 @@
 package com.example.rckbrswatch2app;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> {
 
@@ -53,6 +56,8 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
 
         notifyDataSetChanged();
     }
+    //Zastosować motyw z lista zwracaną, jak w jednym z przykładów w NotePadzie++, i spróbować użyc RXJava, toObservable lub fromArray czy coś i jechane
+
     public List<Element> filterList(List<Element> elements){
         buforList = new ArrayList<>();
             randomWithMathRandom = splittableRandom.nextInt(1,3);
@@ -72,7 +77,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         private TextView textViewTitle;
         private TextView textViewCategory;
         private CheckBox checkBoxWatch;
-
 
         public ElementHolder(@NonNull View itemView) {
             super(itemView);
