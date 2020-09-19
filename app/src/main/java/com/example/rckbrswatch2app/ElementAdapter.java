@@ -1,5 +1,6 @@
 package com.example.rckbrswatch2app;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SplittableRandom;
 
 public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> {
 
     private List<Element> elementList = new ArrayList<>();
+    private List<Element> buforList = new ArrayList<>();
+
+    //Mój szajs
+    int randomWithMathRandom ;
+    SplittableRandom splittableRandom = new SplittableRandom();
+
 
     @NonNull
     @Override
@@ -38,11 +46,26 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     }
 
     public void setElementList(List<Element> elementList){
-        this.elementList = elementList;
+
+
+        this.elementList = filterList(elementList);
 
 
         notifyDataSetChanged();
     }
+    public List<Element> filterList(List<Element> elements){
+        buforList = new ArrayList<>();
+            randomWithMathRandom = splittableRandom.nextInt(1,3);
+        Log.d("Bufor", "Random = " + randomWithMathRandom);
+        for(Element e: elements){
+            if(e.getCategory().equals("Film")&&randomWithMathRandom==1)
+                buforList.add(e);
+            else if (e.getCategory().equals("Gra")&&randomWithMathRandom==2)
+                buforList.add(e);
+        }
+        return buforList;
+    }
+
 
     static class ElementHolder extends RecyclerView.ViewHolder {
 

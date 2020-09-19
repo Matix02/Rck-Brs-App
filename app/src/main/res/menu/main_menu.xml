@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/filter"
-        android:title="Filtr"
+        android:title="Update List"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/settings"
+        android:title="Show Games"
+        app:showAsAction="never"
+        />
 </menu>

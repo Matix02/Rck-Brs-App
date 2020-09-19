@@ -1,27 +1,36 @@
 package com.example.rckbrswatch2app;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.prefs.PreferenceChangeEvent;
+
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     ElementViewModel elementViewModel;
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
+    SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPreferences = getSharedPreferences("SP_Test", MODE_PRIVATE);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -31,23 +40,20 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
-        elementViewModel.getAllElements().observe(this, new Observer<List<Element>>() {
-            @Override
-            public void onChanged(List<Element> elements) {
-                adapter.setElementList(elements);
-                Toast.makeText(MainActivity.this, "onChanged ", Toast.LENGTH_LONG).show();
-            }
-        });
+        elementViewModel.getAllElements().observe(this, adapter::setElementList);
+
+        boolean s = sharedPreferences.getBoolean("GameList", false);
+        Log.d("Bufor", "Boolean is " + s);
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        };
        /* Element element = new Element("title2", "Gra", false, "Rock");
         elementViewModel.createElement(element);*/
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.main_menu, menu);
-        //test
         return true;
     }
 
@@ -57,8 +63,30 @@ public class MainActivity extends AppCompatActivity {
             case R.id.filter:
                 elementViewModel.updateTrigger(5, "title");
                 return true;
+            case R.id.settings:
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        Log.d("Bufor", "Byłem w OnSharedChangeListenr3");
+        boolean d = sharedPreferences.getBoolean("GameList", false);
+        Log.d("Bufor", "Boolean is " + d);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getPreferences(MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getPreferences(MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this);
     }
 }

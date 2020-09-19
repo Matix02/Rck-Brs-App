@@ -134,6 +134,7 @@ public class ElementRoomRepository {
 
     public void clear() { compositeDisposable.clear(); }
 
+
 }
 /*
 //Przed pomysłem z updatem i YES/NO.
