@@ -1,6 +1,5 @@
 package com.example.rckbrswatch2app;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,17 +14,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
 
-import static android.content.Context.MODE_PRIVATE;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> {
 
     private List<Element> elementList = new ArrayList<>();
-    private List<Element> buforList = new ArrayList<>();
+
 
     //Mój szajs
     int randomWithMathRandom ;
     SplittableRandom splittableRandom = new SplittableRandom();
-
+    private List<Element> buforRxList = new ArrayList<>();
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private List<Element> buforRxList2 = new ArrayList<>();
 
     @NonNull
     @Override
@@ -49,17 +57,30 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     }
 
     public void setElementList(List<Element> elementList){
+       this.elementList = filterList(elementList);
+       notifyDataSetChanged();
+    }
 
+    public void setElementList(List<Element> elementList, boolean gameState){
+        //buforRxList2.addAll(filterRxList(elementList, gameState));
+        Single<List<Element>> listSingle = filterRxList(elementList, gameState);
+        compositeDisposable.add(filterRxList(elementList, gameState).subscribe(elements -> {
+            buforRxList2.addAll(elements);
+                    Log.d("Bufor", "Successfully in RxFilterList2 subscribe and " + buforRxList2.size() + " size");
 
-        this.elementList = filterList(elementList);
+                }
+        ));
 
+        Log.d("Bufor", "Successfully in RxFilterList2 and " + buforRxList2.size() + " size");
 
+//Jak się nie znajdzie rozwiązanie to zrobić to prosta funkcją, czyli tak jak na początku tutaj
+        this.elementList = buforRxList2;
         notifyDataSetChanged();
     }
     //Zastosować motyw z lista zwracaną, jak w jednym z przykładów w NotePadzie++, i spróbować użyc RXJava, toObservable lub fromArray czy coś i jechane
 
     public List<Element> filterList(List<Element> elements){
-        buforList = new ArrayList<>();
+        List<Element> buforList = new ArrayList<>();
             randomWithMathRandom = splittableRandom.nextInt(1,3);
         Log.d("Bufor", "Random = " + randomWithMathRandom);
         for(Element e: elements){
@@ -70,6 +91,20 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         }
         return buforList;
     }
+
+    public Single<List<Element>> filterRxList(List<Element> elements, boolean wannaGame){
+        return Observable.fromIterable(elements)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(element -> {
+                  //  if (wannaGame && element.getCategory().equals("Gra"))
+                        return true;
+                  //  else return !wannaGame && element.getCategory().equals("Film");
+                }).toList();
+       // Log.d("Bufor", "RxFilterList/End and " + buforRxList.size() + " size");
+       // return buforRxList;
+    }
+    public void clear() { compositeDisposable.clear(); }
 
 
     static class ElementHolder extends RecyclerView.ViewHolder {

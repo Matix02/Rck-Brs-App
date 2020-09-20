@@ -14,11 +14,18 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     ElementViewModel elementViewModel;
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     SharedPreferences sharedPreferences;
+
+    //Moj szajs
+    ElementAdapter adapter;
+    List<Element> elementList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,19 +38,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        final ElementAdapter adapter = new ElementAdapter();
+        adapter = new ElementAdapter();
         recyclerView.setAdapter(adapter);
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
-        elementViewModel.getAllElements().observe(this, adapter::setElementList);
+       // elementViewModel.getAllElements().observe(this, adapter::setElementList);
 
-        boolean s = sharedPreferences.getBoolean("GameList", false);
-        Log.d("Bufor", "Boolean is " + s);
+        elementViewModel.getAllElements().observe(this, elements -> {
+            boolean game = sharedPreferences.getBoolean("GameList", false);
+            Log.d("Bufor", "Boolean is " + game + " in Observe");
+            /*elementList.clear();
+            elementList.addAll(elements);
+            adapter.setElementList(elementList, game);*/
+            adapter.setElementList(elements, game);
+        });
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        }
-       /* Element element = new Element("title2", "Gra", false, "Rock");
-        elementViewModel.createElement(element);*/
+        }       /* Element element = new Element("title2", "Gra", false, "Rock");
+        elementViewModel.createElement(element); */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,7 +82,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         Log.d("Bufor", "Byłem w OnSharedChangeListenr3");
-
+        boolean game = sharedPreferences.getBoolean("GameList", false);
+        Log.d("Bufor", "Boolean is " + game + " in onSharedPreferenceChanged");
+        adapter.setElementList(elementList, game);
     }
 
     @Override
