@@ -7,13 +7,26 @@ import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subscribers.DisposableSubscriber;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ElementRoomRepository {
 
@@ -24,6 +37,8 @@ public class ElementRoomRepository {
     private long rowIdOfTheItemInserted;
 
     //Mój szajs
+    SharedPreferences sharedPreferences;
+    List<Element> elements = new ArrayList<>();
 
 
     public ElementRoomRepository(Application application) {
@@ -31,14 +46,22 @@ public class ElementRoomRepository {
 
         ElementDatabase elementDatabase = ElementDatabase.getInstance(application);
         elementDao = elementDatabase.getElementDao();
+        sharedPreferences = application.getSharedPreferences("SP_Test", MODE_PRIVATE);
+
+        AtomicBoolean game = new AtomicBoolean(sharedPreferences.getBoolean("GameList", false));
+        Log.d("Bufor", "Boolean is " + game + " in Constructor");
 
         compositeDisposable.add(elementDao.getElements()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(elements -> {
-                    Log.d("Bufor",  "Constructor");
-                    elementLiveData.postValue(elements);
-                }));
+                .toObservable()
+                .flatMap((Function<List<Element>, Observable<Element>>) elements -> Observable.fromArray(elements.toArray(new Element[0])))
+                .filter(element -> {
+                    game.set(sharedPreferences.getBoolean("GameList", false));
+                    Log.d("Bufor", "Boolean is " + game + " in Filter");
+                    return true;
+                })
+                .subscribe();
     }
 
     public MutableLiveData<List<Element>> getElementLiveData() {

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
+import java.util.stream.Collectors;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -57,22 +58,25 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     }
 
     public void setElementList(List<Element> elementList){
-       this.elementList = filterList(elementList);
+       this.elementList = elementList;
        notifyDataSetChanged();
     }
 
+    public void setElementFilterList(List<Element> elementList, boolean gameState){
+        this.elementList = filterNormalList(elementList, gameState);
+        Log.d("Bufor", "ElementList from NormalList " + elementList.size() + " size");
+
+        notifyDataSetChanged();
+    }
     public void setElementList(List<Element> elementList, boolean gameState){
         //buforRxList2.addAll(filterRxList(elementList, gameState));
         Single<List<Element>> listSingle = filterRxList(elementList, gameState);
         compositeDisposable.add(filterRxList(elementList, gameState).subscribe(elements -> {
             buforRxList2.addAll(elements);
                     Log.d("Bufor", "Successfully in RxFilterList2 subscribe and " + buforRxList2.size() + " size");
-
                 }
         ));
-
         Log.d("Bufor", "Successfully in RxFilterList2 and " + buforRxList2.size() + " size");
-
 //Jak się nie znajdzie rozwiązanie to zrobić to prosta funkcją, czyli tak jak na początku tutaj
         this.elementList = buforRxList2;
         notifyDataSetChanged();
@@ -90,6 +94,13 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
                 buforList.add(e);
         }
         return buforList;
+    }
+
+    public List<Element> filterNormalList(List<Element> elements, boolean gameState){
+        Log.d("Bufor", "ElementList from NormalListFunction before start filtering " + elements.size() + " size");
+        if(gameState)
+            return elements.stream().filter(element -> element.getCategory().equals("Gra")).collect(Collectors.toList());
+        else return elements;
     }
 
     public Single<List<Element>> filterRxList(List<Element> elements, boolean wannaGame){

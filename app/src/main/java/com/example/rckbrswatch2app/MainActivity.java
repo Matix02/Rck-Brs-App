@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             /*elementList.clear();
             elementList.addAll(elements);
             adapter.setElementList(elementList, game);*/
-            adapter.setElementList(elements, game);
+            adapter.setElementList(elements);
         });
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -81,10 +81,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        Log.d("Bufor", "Byłem w OnSharedChangeListenr3");
         boolean game = sharedPreferences.getBoolean("GameList", false);
-        Log.d("Bufor", "Boolean is " + game + " in onSharedPreferenceChanged");
-        adapter.setElementList(elementList, game);
+        Log.d("Bufor", game + " in onSharedPreferenceChanged");
+        Log.d("Bufor", "Size elementList "+elementList.size() + " in onSharedPreferenceChanged");
+
+        adapter.setElementFilterList(elementList, game);
     }
 
     @Override
