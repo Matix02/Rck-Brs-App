@@ -49,24 +49,20 @@ public class ElementRoomRepository {
         sharedPreferences = application.getSharedPreferences("SP_Test", MODE_PRIVATE);
 
         AtomicBoolean game = new AtomicBoolean(sharedPreferences.getBoolean("GameList", false));
-        Log.d("Bufor", "Boolean is " + game + " in Constructor");
 
         compositeDisposable.add(elementDao.getElements()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .toObservable()
-                .flatMap((Function<List<Element>, Observable<Element>>) elements -> Observable.fromArray(elements.toArray(new Element[0])))
-                .filter(element -> {
-                    game.set(sharedPreferences.getBoolean("GameList", false));
-                    Log.d("Bufor", "Boolean is " + game + " in Filter");
-                    return true;
-                })
-                .subscribe();
+                .subscribe(elements1 -> {
+                    elementLiveData.postValue(elements1);
+                }));
     }
 
     public MutableLiveData<List<Element>> getElementLiveData() {
         return elementLiveData;
     }
+
+    public void clear() { compositeDisposable.clear(); }
 
     public void createElement(int id, final String title, final String category, final String reccomendation, Boolean isWached) {
         compositeDisposable.add(Completable.fromAction(() -> rowIdOfTheItemInserted = elementDao.addElement(new Element(id, title, category, isWached, reccomendation)))
@@ -157,7 +153,7 @@ public class ElementRoomRepository {
         );
     }
 
-    public void clear() { compositeDisposable.clear(); }
+
 
 
 }

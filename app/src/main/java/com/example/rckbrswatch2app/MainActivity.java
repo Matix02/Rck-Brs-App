@@ -7,10 +7,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,7 +44,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         recyclerView.setAdapter(adapter);
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
-       // elementViewModel.getAllElements().observe(this, adapter::setElementList);
+
+       /*Wykorzystac to niżej zakomentowane, jesli nie bedzie zadnych nowych funkcji
+        // elementViewModel.getAllElements().observe(this, adapter::setElementList);
+        */
 
         elementViewModel.getAllElements().observe(this, elements -> {
             boolean game = sharedPreferences.getBoolean("GameList", false);
@@ -54,7 +59,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         });
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        }       /* Element element = new Element("title2", "Gra", false, "Rock");
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                elementViewModel.deleteElement(adapter.getElementAt(viewHolder.getAdapterPosition()));
+                Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
+            }
+        }).attachToRecyclerView(recyclerView);
+    }
+        /* Element element = new Element("title2", "Gra", false, "Rock");
         elementViewModel.createElement(element); */
 
     @Override
@@ -82,10 +102,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         boolean game = sharedPreferences.getBoolean("GameList", false);
-        Log.d("Bufor", game + " in onSharedPreferenceChanged");
         Log.d("Bufor", "Size elementList "+elementList.size() + " in onSharedPreferenceChanged");
-
-        adapter.setElementFilterList(elementList, game);
     }
 
     @Override
