@@ -9,7 +9,6 @@ import androidx.room.Update;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 /*
 Zastosować opcję z Medium.com, gdzie są podane zasady optymalizacji Room'a.
@@ -28,17 +27,6 @@ public interface ElementDao {
     @Delete
     void deleteElement(Element element);
 
-    @Query("delete from Element")
-    void deleteAllElements();
-
-    @Query("UPDATE Element\n" +
-            "SET " +
-            "title =:title,\n" +
-            "share =:recommendation,\n" +
-            "category =:cat\n" +
-            "WHERE id =:Id")
-    void updateElementById(long Id, String title, String recommendation, String cat);
-
     @Query("UPDATE Element\n" +
             "SET " +
             "title =:title\n" +
@@ -47,6 +35,19 @@ public interface ElementDao {
 
     @Query("select * from Element")
     Flowable<List<Element>> getElements();
+
+    /*////////////////////////////////////////////////////
+    // OFFLINE //
+    ////////////////////////////////////////////////////
+    @Query("UPDATE Element\n" +
+            "SET " +
+            "title =:title,\n" +
+            "share =:recommendation,\n" +
+            "category =:cat\n" +
+            "WHERE id =:Id")
+    void updateElementById(long Id, String title, String recommendation, String cat);
+        @Query("delete from Element")
+    void deleteAllElements();
 
     @Query("UPDATE Element\n" +
             "SET isWatched =:resultWatch\n" +
@@ -88,5 +89,5 @@ public interface ElementDao {
             "AND category =:categoryName\n" +
             "ORDER BY RANDOM()\n" +
             "LIMIT 1")
-    Single<Element> getNoWatchedRandomElementByCategory(String categoryName);
+    Single<Element> getNoWatchedRandomElementByCategory(String categoryName);*/
 }

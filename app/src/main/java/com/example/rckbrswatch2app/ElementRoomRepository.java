@@ -1,7 +1,6 @@
 package com.example.rckbrswatch2app;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -9,24 +8,17 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subscribers.DisposableSubscriber;
 
-import static android.content.Context.MODE_PRIVATE;
 
 public class ElementRoomRepository {
 
@@ -34,28 +26,23 @@ public class ElementRoomRepository {
     private ElementDao elementDao;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
+
     private long rowIdOfTheItemInserted;
 
-    //Mój szajs
-    SharedPreferences sharedPreferences;
-    List<Element> elements = new ArrayList<>();
-
+    //Moj szajs
+    List<Element> elementList;
+    private MutableLiveData<List<Element>> elementFilterLiveData = new MutableLiveData<>();
 
     public ElementRoomRepository(Application application) {
         this.application = application;
 
         ElementDatabase elementDatabase = ElementDatabase.getInstance(application);
         elementDao = elementDatabase.getElementDao();
-        sharedPreferences = application.getSharedPreferences("SP_Test", MODE_PRIVATE);
-
-        AtomicBoolean game = new AtomicBoolean(sharedPreferences.getBoolean("GameList", false));
 
         compositeDisposable.add(elementDao.getElements()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(elements1 -> {
-                    elementLiveData.postValue(elements1);
-                }));
+                .subscribe(elements -> elementLiveData.postValue(elements)));
     }
 
     public MutableLiveData<List<Element>> getElementLiveData() {
@@ -153,33 +140,67 @@ public class ElementRoomRepository {
         );
     }
 
+    public MutableLiveData<List<Element>> filterList(final List<Element> elements, boolean state)
+    {
+        elementList = new ArrayList<>();
+        compositeDisposable.add(Observable.fromArray(elements)
+                .flatMap((Function<List<Element>, Observable<Element>>) elements1 -> Observable.fromArray(elements1.toArray(new Element[0])))
+                .filter(element -> {
+                    if(element.getCategory().equals("Film")&&state)
+                        return true;
+                    else if (element.getCategory().equals("Gra")&&!state)
+                        return true;
+                    return false;
+                })
+        .subscribeWith(new DisposableObserver<Element>() {
+            @Override
+            public void onNext(Element element) {
+                Log.d("Bufor", "onNext " + element.getTitle());
+                elementList.add(element);
+            }
+            @Override
+            public void onError(Throwable e) {
+                Log.d("Bufor", "Error");
+            }
 
+            @Override
+            public void onComplete() {
+                Log.d("Bufor", "onComplete " + elementList.size());
+                elementFilterLiveData.postValue(elementList);
+            }
+        }));
 
-
-}
-/*
-//Przed pomysłem z updatem i YES/NO.
-        compositeDisposable.add(elementDao.getElements()
-                .subscribeOn(Schedulers.computation())
+        return elementFilterLiveData;
+      /*  compositeDisposable.add(Completable.fromObservable(Observable.fromIterable(elements))
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .toObservable()
-                .flatMap((Function<List<Element>, Observable<Element>>) elements -> Observable.fromArray(elements.toArray(new Element[0])))
-                .filter(new Predicate<Element>() {
+                .subscribeWith(new DisposableCompletableObserver() {
                     @Override
-                    public boolean test(Element element) throws Exception {
-                        return element.getCategory().equals("Gra");
+                    public void onComplete() {
+                        Toast.makeText(application.getApplicationContext(), "Filter successfully!!!", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(application.getApplicationContext(), "You fucked it up!!!", Toast.LENGTH_LONG).show();
+                    }
+                }));*/
+    }
+    public void filterElement(final Element element) {
+        compositeDisposable.add(Completable.fromAction(() -> elementDao.deleteElement(element))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(application.getApplicationContext(), "Element has been deleted successfully", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(application.getApplicationContext(), "Error occurred", Toast.LENGTH_LONG).show();
                     }
                 })
-                .reduce(new ArrayList<Element>(), (elements, element) -> {
-                    Log.d("Bufor", "Reduce - Constructor");
-                    elements.add(element);
-
-                    elementLiveData.postValue(elements);
-                    return elements;
-                })
-                .subscribe(elements -> {
-                    Log.d("Bufor", "Subscribe - Constructor");
-                    elementLiveData.postValue(elements);
-                })
         );
- */
+    }
+}

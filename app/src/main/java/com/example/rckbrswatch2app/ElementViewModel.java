@@ -1,6 +1,7 @@
 package com.example.rckbrswatch2app;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -25,7 +26,11 @@ public class ElementViewModel extends AndroidViewModel {
     public void createElement(int id, String title, String category, String share, boolean isWatched) {
         elementRoomRepository.createElement(id, title, category, share, isWatched);
     }
-
+    public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
+    {
+        Log.d("Bufor", "Filter !!!");
+        return elementRoomRepository.filterList(elements, gamestate);
+    }
 
     public void createElement(Element element) {
         elementRoomRepository.createElement(element);

@@ -51,18 +51,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         return elementList.get(position);
     }
 
-    public List<Element> filterList(List<Element> elements){
-        List<Element> buforList = new ArrayList<>();
-            randomWithMathRandom = splittableRandom.nextInt(1,3);
-        Log.d("Bufor", "Random = " + randomWithMathRandom);
-        for(Element e: elements){
-            if(e.getCategory().equals("Film")&&randomWithMathRandom==1)
-                buforList.add(e);
-            else if (e.getCategory().equals("Gra")&&randomWithMathRandom==2)
-                buforList.add(e);
-        }
-        return buforList;
-    }
+
 
     static class ElementHolder extends RecyclerView.ViewHolder {
 

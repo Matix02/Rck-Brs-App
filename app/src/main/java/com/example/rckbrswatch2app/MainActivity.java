@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     //Moj szajs
     ElementAdapter adapter;
     List<Element> elementList = new ArrayList<>();
+    List<Element> elementFilterList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +53,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         elementViewModel.getAllElements().observe(this, elements -> {
             boolean game = sharedPreferences.getBoolean("GameList", false);
-            Log.d("Bufor", "Boolean is " + game + " in Observe");
-            /*elementList.clear();
+            Log.d("Bufor", "OBSERVE ");
+            elementList.clear();
             elementList.addAll(elements);
-            adapter.setElementList(elementList, game);*/
+            /* adapter.setElementList(elementList, game);*/
             adapter.setElementList(elements);
         });
 
@@ -73,9 +75,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
+        /*
+        Element element = new Element("title2", "Gra", false, "Rock");
+            elementViewModel.createElement(element);
+*/
     }
-        /* Element element = new Element("title2", "Gra", false, "Rock");
-        elementViewModel.createElement(element); */
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -102,9 +107,26 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         boolean game = sharedPreferences.getBoolean("GameList", false);
+        elementFilterList = new ArrayList<>();
         Log.d("Bufor", "Size elementList "+elementList.size() + " in onSharedPreferenceChanged");
+        elementFilterList.addAll(filterList(elementList, game));
+        Log.d("Bufor", "Size elementFilterList "+elementFilterList.size() + " in onSharedPreferenceChanged");
+        elementViewModel.filterElement(elementFilterList, game).observe(this, elements -> {
+            Log.d("Bufor", "Size MAIN Elements "+elements.size() + " in onSharedPreferenceChanged");
+            adapter.setElementList(elements);
+        });
+        //adapter.setElementList(elementFilterList);
     }
-
+    public List<Element> filterList(List<Element> elements, boolean state){
+        List<Element> buforList = new ArrayList<>();
+        for(Element e: elements){
+            if(e.getCategory().equals("Film")&&state)
+                buforList.add(e);
+            else if (e.getCategory().equals("Gra")&&!state)
+                buforList.add(e);
+        }
+        return buforList;
+    }
     @Override
     protected void onResume() {
         super.onResume();
