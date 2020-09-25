@@ -15,17 +15,32 @@ public class ElementViewModel extends AndroidViewModel {
     private ElementRoomRepository elementRoomRepository;
     private MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
 
+    //Start mojego szajsu
+    FirebaseRepository firebaseRepository;
+    private MutableLiveData<List<Element>> firebaseLiveData = new MutableLiveData<>();
+
+    //Koniec Mojego szajus
     public ElementViewModel(@NonNull Application application) {
         super(application);
         elementRoomRepository = new ElementRoomRepository(application);
         elementLiveData = elementRoomRepository.getElementLiveData();
+        //Start mojego szajsu
+        firebaseRepository = new FirebaseRepository();
     }
+
+    public LiveData<List<Element>> getFirebaseElements(){
+        Log.d("Bufor", "FIREBASE LiveDATA");
+
+        return firebaseRepository.readFirebaseElements();
+    }
+    //Koniec Mojego szajus
 
     public LiveData<List<Element>> getAllElements() { return elementLiveData; }
 
     public void createElement(int id, String title, String category, String share, boolean isWatched) {
         elementRoomRepository.createElement(id, title, category, share, isWatched);
     }
+
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
     {
         Log.d("Bufor", "Filter !!!");

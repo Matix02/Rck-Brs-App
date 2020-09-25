@@ -22,13 +22,15 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     ElementViewModel elementViewModel;
-    SharedPreferences.OnSharedPreferenceChangeListener listener;
     SharedPreferences sharedPreferences;
 
     //Moj szajs
     ElementAdapter adapter;
     List<Element> elementList = new ArrayList<>();
     List<Element> elementFilterList;
+    boolean gameState;
+
+    List<Element> firebaseFilterList;
 
 
     @Override
@@ -47,19 +49,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
 
-       /*Wykorzystac to niżej zakomentowane, jesli nie bedzie zadnych nowych funkcji
-        // elementViewModel.getAllElements().observe(this, adapter::setElementList);
-        */
-
         elementViewModel.getAllElements().observe(this, elements -> {
-            boolean game = sharedPreferences.getBoolean("GameList", false);
             Log.d("Bufor", "OBSERVE ");
             elementList.clear();
             elementList.addAll(elements);
-            /* adapter.setElementList(elementList, game);*/
-            adapter.setElementList(elements);
+            filterList();
+            /* adapter.setElementList(elementList, game);
+            adapter.setElementList(elements);*/
         });
-
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
@@ -79,8 +76,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Element element = new Element("title2", "Gra", false, "Rock");
             elementViewModel.createElement(element);
 */
+
+        elementViewModel.getFirebaseElements().observe(this, elements ->
+        {
+           // firebaseFilterList = new ArrayList<>();
+
+           // firebaseFilterList.addAll(elements);
+            elements.size();
+            Log.d("Bufor", "FIREBASE elements size " + elements.size());
+
+        });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,27 +118,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        boolean game = sharedPreferences.getBoolean("GameList", false);
+        filterList();
+    }
+    public void filterList(){
         elementFilterList = new ArrayList<>();
-        Log.d("Bufor", "Size elementList "+elementList.size() + " in onSharedPreferenceChanged");
-        elementFilterList.addAll(filterList(elementList, game));
-        Log.d("Bufor", "Size elementFilterList "+elementFilterList.size() + " in onSharedPreferenceChanged");
-        elementViewModel.filterElement(elementFilterList, game).observe(this, elements -> {
-            Log.d("Bufor", "Size MAIN Elements "+elements.size() + " in onSharedPreferenceChanged");
+        gameState = sharedPreferences.getBoolean("GameList", false);
+        elementFilterList.addAll(elementList);
+
+        elementViewModel.filterElement(elementFilterList, gameState).observe(this, elements -> {
+            Log.d("Bufor", "_FILTER_ Size Elements "+elements.size() + " in onSharedPreferenceChanged/FilterElement/Observe");
             adapter.setElementList(elements);
         });
-        //adapter.setElementList(elementFilterList);
     }
-    public List<Element> filterList(List<Element> elements, boolean state){
-        List<Element> buforList = new ArrayList<>();
-        for(Element e: elements){
-            if(e.getCategory().equals("Film")&&state)
-                buforList.add(e);
-            else if (e.getCategory().equals("Gra")&&!state)
-                buforList.add(e);
-        }
-        return buforList;
-    }
+
     @Override
     protected void onResume() {
         super.onResume();
