@@ -27,6 +27,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.element_item, parent, false);
         return new ElementHolder(itemView);
+        //test
     }
 
     @Override
