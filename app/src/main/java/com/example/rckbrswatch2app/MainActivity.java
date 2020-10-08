@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     List<Element> elementList = new ArrayList<>();
     List<Element> elementFilterList;
     boolean gameState;
-
     List<Element> firebaseFilterList;
 
 
@@ -59,6 +61,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         });
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
+        // Firebase Start
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference("Elements");
+        Element element = new Element("asdas", "sadasd", false, "wdad");
+        reference.child(String.valueOf(1)).setValue(element);
+
+
+
+        //Firebase End
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -77,21 +88,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             elementViewModel.createElement(element);
 */
 
-        elementViewModel.getFirebaseElements().observe(this, elements ->
+       /* elementViewModel.getFirebaseElements().observe(this, elements ->
         {
            // firebaseFilterList = new ArrayList<>();
-
            // firebaseFilterList.addAll(elements);
-            elements.size();
             Log.d("Bufor", "FIREBASE elements size " + elements.size());
-
-        });
+            adapter.setElementList(elements);
+        });*/
+       elementViewModel.getDb();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
     }
 
     @Override
@@ -110,6 +119,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.addF:
+                Element element = new Element("Hello", "Film", true, "Rock");
+                //elementViewModel.createFirebaseElement(element);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

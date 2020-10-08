@@ -1,63 +1,34 @@
 {
   "project_info": {
-    "project_number": "848517523894",
-    "firebase_url": "https://watchapp-cd5cf.firebaseio.com",
-    "project_id": "watchapp-cd5cf",
-    "storage_bucket": "watchapp-cd5cf.appspot.com"
+    "project_number": "809175734471",
+    "firebase_url": "https://rckbrswatch2app.firebaseio.com",
+    "project_id": "rckbrswatch2app",
+    "storage_bucket": "rckbrswatch2app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:848517523894:android:e304b0e76b893dffd0b917",
-        "android_client_info": {
-          "package_name": "com.example.myapplication"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "848517523894-vcv0a6fmakiednj5tsgh50ltgbtc6k4s.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBLbhg9OVqs2Ttj_dx45aDZ8PcO8iumE_Y"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "848517523894-vcv0a6fmakiednj5tsgh50ltgbtc6k4s.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:848517523894:android:9f00b9497495e2dfd0b917",
+        "mobilesdk_app_id": "1:809175734471:android:876558e71ee0c3972306e2",
         "android_client_info": {
           "package_name": "com.example.rckbrswatch2app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "848517523894-vcv0a6fmakiednj5tsgh50ltgbtc6k4s.apps.googleusercontent.com",
+          "client_id": "809175734471-06gh54i2gocpuk5iqktnnkkcb0d87olv.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBLbhg9OVqs2Ttj_dx45aDZ8PcO8iumE_Y"
+          "current_key": "AIzaSyD1CE-j2e698_XJt6GwiKYv6xoloN8FBak"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "848517523894-vcv0a6fmakiednj5tsgh50ltgbtc6k4s.apps.googleusercontent.com",
+              "client_id": "809175734471-06gh54i2gocpuk5iqktnnkkcb0d87olv.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

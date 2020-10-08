@@ -36,6 +36,12 @@ public interface ElementDao {
     @Query("select * from Element")
     Flowable<List<Element>> getElements();
 
+
+    @Query("SELECT * \n" +
+            "FROM Element\n" +
+            "ORDER BY id\n" +
+            "DESC LIMIT 1")
+    int getLastIndex();
     /*////////////////////////////////////////////////////
     // OFFLINE //
     ////////////////////////////////////////////////////
@@ -70,11 +76,6 @@ public interface ElementDao {
             "WHERE ID =:oldId ")
     void updateID(int actualID, int oldId);
 
-    @Query("SELECT * \n" +
-            "FROM Element\n" +
-            "ORDER BY id\n" +
-            "DESC LIMIT 1")
-    int getLastIndex();
 
     @Query("SELECT * \n" +
             "FROM Element \n" +

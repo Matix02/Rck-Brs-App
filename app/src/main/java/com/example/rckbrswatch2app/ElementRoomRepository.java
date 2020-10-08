@@ -13,8 +13,8 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -51,7 +51,7 @@ public class ElementRoomRepository {
 
     public void clear() { compositeDisposable.clear(); }
 
-    public void createElement(int id, final String title, final String category, final String reccomendation, Boolean isWached) {
+   /* public void createElement(int id, final String title, final String category, final String reccomendation, Boolean isWached) {
         compositeDisposable.add(Completable.fromAction(() -> rowIdOfTheItemInserted = elementDao.addElement(new Element(id, title, category, isWached, reccomendation)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -66,7 +66,7 @@ public class ElementRoomRepository {
                         Toast.makeText(application.getApplicationContext(), "Error occurred", Toast.LENGTH_LONG).show();
                     }
                 }));
-    }
+    }*/
 
     public void createElement(Element element) {
         compositeDisposable.add(Completable.fromAction(() -> elementDao.addElement(element))

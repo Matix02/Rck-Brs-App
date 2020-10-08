@@ -27,19 +27,26 @@ public class ElementViewModel extends AndroidViewModel {
         //Start mojego szajsu
         firebaseRepository = new FirebaseRepository();
     }
+    public void getDb(){
+      ///  firebaseRepository.read();
+        Log.d("Bufor", "dziala");
 
-    public LiveData<List<Element>> getFirebaseElements(){
+    }
+
+   /* public LiveData<List<Element>> getFirebaseElements(){
         Log.d("Bufor", "FIREBASE LiveDATA");
-
         return firebaseRepository.readFirebaseElements();
     }
+    public void createFirebaseElement(Element element){
+        firebaseRepository.createFirebaseElement(element);
+    }*/
     //Koniec Mojego szajus
 
     public LiveData<List<Element>> getAllElements() { return elementLiveData; }
 
-    public void createElement(int id, String title, String category, String share, boolean isWatched) {
+  /*  public void createElement(int id, String title, String category, String share, boolean isWatched) {
         elementRoomRepository.createElement(id, title, category, share, isWatched);
-    }
+    }*/
 
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
     {

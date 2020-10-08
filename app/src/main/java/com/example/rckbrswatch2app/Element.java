@@ -30,37 +30,38 @@ public class Element {
         this.share = share;
     }
 
+
     public long getId() { return id; }
 
     public void setId(long id) { this.id = id; }
 
-    String getTitle() {
+    public String getTitle() {
         return title;
     }
 
-    void setTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    String getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    void setCategory(String category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
-    boolean isWatched() {
+    public boolean isWatched() {
         return isWatched;
     }
 
-    void setWatched(boolean watched) {
+    public void setWatched(boolean watched) {
         isWatched = watched;
     }
 
-    String getShare() { return share; }
+    public String getShare() { return share; }
 
-    void setShare(String recom) { this.share = recom; }
+    public void setShare(String recom) { this.share = recom; }
 }
 
 

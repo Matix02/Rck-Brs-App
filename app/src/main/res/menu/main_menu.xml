@@ -10,4 +10,9 @@
         android:title="Show Games"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/addF"
+        android:title="Add Firebase"
+        app:showAsAction="never"
+        />
 </menu>
