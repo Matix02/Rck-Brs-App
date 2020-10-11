@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     boolean gameState;
     List<Element> firebaseFilterList;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,19 +54,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Log.d("Bufor", "OBSERVE ");
             elementList.clear();
             elementList.addAll(elements);
-            filterList();
+           // filterList();
             /* adapter.setElementList(elementList, game);
             adapter.setElementList(elements);*/
         });
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         // Firebase Start
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+       /* FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Elements");
         Element element = new Element("asdas", "sadasd", false, "wdad");
         reference.child(String.valueOf(1)).setValue(element);
 
-
+*/
 
         //Firebase End
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
@@ -83,19 +82,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
-        /*
-        Element element = new Element("title2", "Gra", false, "Rock");
-            elementViewModel.createElement(element);
-*/
 
-       /* elementViewModel.getFirebaseElements().observe(this, elements ->
+        Element element = new Element("title2", "Gra", false, "Rock");
+        elementViewModel.createFirebaseElement(element);
+
+        elementViewModel.getFirebaseElements().observe(this, elements ->
         {
            // firebaseFilterList = new ArrayList<>();
            // firebaseFilterList.addAll(elements);
-            Log.d("Bufor", "FIREBASE elements size " + elements.size());
+            Log.d("xkanapka", "FIREBASE elements size " + elements.size());
             adapter.setElementList(elements);
-        });*/
-       elementViewModel.getDb();
+        });
     }
 
     @Override

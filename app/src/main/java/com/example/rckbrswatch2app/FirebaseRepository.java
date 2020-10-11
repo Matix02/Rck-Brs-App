@@ -35,8 +35,7 @@ public class FirebaseRepository {
 
     public FirebaseRepository() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        mReferenceElement = mDatabase.getReference("Element");
-
+        mReferenceElement = mDatabase.getReference("Elements");
     }
 
     //Sprobówać ogarnąć RxFirebase'a
@@ -50,17 +49,12 @@ public class FirebaseRepository {
                 {
                     Element element = keyNode.getValue(Element.class);
                     elementList.add(element);
-                    Log.d("Xkanapka", "in foreach");
                 }
                 Log.d("Xkanapka", "Size = " + elementList.size());
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) { }
         });
-
        /* compositeDisposable.add(RxFirebaseDatabase.dataChanges(mReferenceElement)
         .subscribe(dataSnapshot -> {
             if (dataSnapshot.exists()){
@@ -77,15 +71,7 @@ public class FirebaseRepository {
         return elementLiveData;
     }
 
-    public void createFirebaseElement( Element element){
-        Element element1 = new Element(5, "Dsajd", "dasdas", true, "asdasd");
-        String id = mReferenceElement.getKey();
-
-     //   Log.d("Bufor", "Element is = " +id );
-        //takie mech
-        element1.setTitle("asdasdasd");
-        mReferenceElement.child(String.valueOf(250)).setValue(element1);
-
-
+    public void createFirebaseElement(Element element){
+        mReferenceElement.push().setValue(element);
     }
 }
