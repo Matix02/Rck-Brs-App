@@ -27,6 +27,8 @@ public class ElementRoomRepository {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
 
+    private MutableLiveData<List<Element>> elementLiveFirebaseData = new MutableLiveData<>();
+
     private long rowIdOfTheItemInserted;
 
     //Moj szajs
@@ -68,6 +70,30 @@ public class ElementRoomRepository {
                 }));
     }*/
 
+    public MutableLiveData<List<Element>> equalData(List<Element> elements){
+        compositeDisposable.add(Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                elementLiveFirebaseData.postValue(elements);
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+        .subscribeWith(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+                Toast.makeText(application.getApplicationContext(), "List has been updated successfully ", Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(application.getApplicationContext(), "Error occurred", Toast.LENGTH_LONG).show();
+            }
+        }));
+
+        return elementLiveFirebaseData;
+    }
     public void createElement(Element element) {
         compositeDisposable.add(Completable.fromAction(() -> elementDao.addElement(element))
                 .subscribeOn(Schedulers.io())

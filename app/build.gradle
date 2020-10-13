@@ -33,7 +33,7 @@ dependencies {
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "androidx.recyclerview:recyclerview:1.1.0"
 
@@ -42,14 +42,13 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "android.arch.lifecycle:extensions:1.1.1"
 
-    implementation platform('com.google.firebase:firebase-bom:25.12.0')
 
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
     implementation platform('com.google.firebase:firebase-bom:25.12.0')
     implementation 'com.google.firebase:firebase-database'
-
+    //RxJava
     implementation "androidx.room:room-rxjava2:$room_version"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.19'

@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
@@ -47,14 +46,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         recyclerView.setAdapter(adapter);
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
-
+        long startTime = System.currentTimeMillis();
         //Firebase
         elementViewModel.getFirebaseElements().observe(this, elements ->
         {
              firebaseFilterList = new ArrayList<>();
              firebaseFilterList.addAll(elements);
              Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
+             adapter.setElementList(firebaseFilterList);
 
+            elementViewModel.deleteAllElements();
+            for(int i=0; i<elements.size();  i++){
+
+                elementViewModel.createElement(elements.get(i));
+            }
+            // elementViewModel.updateList(firebaseFilterList);
             //Room
             elementViewModel.getAllElements().observe(this, elements1 -> {
                 Log.d("RoomDB", "ROOM elements size " + elements1.size());
@@ -67,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             });
         });
 
+        long endTime = System.currentTimeMillis();
+        long duration = (endTime - startTime);
+        Log.d("TimeBufor", "Time is " + duration+" ms");
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,

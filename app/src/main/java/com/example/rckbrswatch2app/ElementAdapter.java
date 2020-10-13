@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +21,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     //Mój szajs
     int randomWithMathRandom ;
     SplittableRandom splittableRandom = new SplittableRandom();
+    MainActivity mainActivity;
 
     @NonNull
     @Override
@@ -36,6 +38,13 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         holder.textViewTitle.setText(element.getTitle());
         holder.textViewCategory.setText(element.getCategory());
         holder.checkBoxWatch.setChecked(element.isWatched());
+
+        holder.checkBoxWatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+Log.d("Bufor", "CHECKBOXWATCH");
+            }
+        });
     }
 
     @Override
@@ -65,6 +74,8 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
             textViewTitle = itemView.findViewById(R.id.titleTV);
             textViewCategory = itemView.findViewById(R.id.categoryTV);
             checkBoxWatch = itemView.findViewById(R.id.watchCB);
+
+
 
         }
     }
