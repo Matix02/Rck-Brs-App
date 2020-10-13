@@ -15,4 +15,9 @@
         android:title="Add Firebase"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/deleteRoom"
+        android:title="Delete All Room"
+        app:showAsAction="never"
+        />
 </menu>

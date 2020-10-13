@@ -139,6 +139,23 @@ public class ElementRoomRepository {
                 })
         );
     }
+    public void deleteAllElements() {
+        compositeDisposable.add(Completable.fromAction(() -> elementDao.deleteAllElements())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(application.getApplicationContext(), "RoomDB has been cleared successfully", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(application.getApplicationContext(), "Error occurred", Toast.LENGTH_LONG).show();
+                    }
+                })
+        );
+    }
 
     public MutableLiveData<List<Element>> filterList(final List<Element> elements, boolean state)
     {

@@ -61,6 +61,8 @@ public class ElementViewModel extends AndroidViewModel {
         elementRoomRepository.deleteElement(element);
     }
 
+    public void deleteAllElements(){ elementRoomRepository.deleteAllElements();}
+
     public void clear() {
         elementRoomRepository.clear();
     }

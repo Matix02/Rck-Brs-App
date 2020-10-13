@@ -51,6 +51,7 @@ public class FirebaseRepository {
                     elementList.add(element);
                 }
                 Log.d("Xkanapka", "Size = " + elementList.size());
+                elementLiveData.postValue(elementList);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }

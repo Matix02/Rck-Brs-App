@@ -16,11 +16,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
@@ -50,25 +48,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
 
-        elementViewModel.getAllElements().observe(this, elements -> {
-            Log.d("Bufor", "OBSERVE ");
-            elementList.clear();
-            elementList.addAll(elements);
-           // filterList();
-            /* adapter.setElementList(elementList, game);
-            adapter.setElementList(elements);*/
+        //Firebase
+        elementViewModel.getFirebaseElements().observe(this, elements ->
+        {
+             firebaseFilterList = new ArrayList<>();
+             firebaseFilterList.addAll(elements);
+             Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
+
+            //Room
+            elementViewModel.getAllElements().observe(this, elements1 -> {
+                Log.d("RoomDB", "ROOM elements size " + elements1.size());
+                elementList.clear();
+                elementList.addAll(elements1);
+                Log.d("RoomDB", "ROOM after stream elements size " + elementList.size());
+                adapter.setElementList(firebaseFilterList);
+
+                // filterList();
+            });
         });
+
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        // Firebase Start
-       /* FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference("Elements");
-        Element element = new Element("asdas", "sadasd", false, "wdad");
-        reference.child(String.valueOf(1)).setValue(element);
-
-*/
-
-        //Firebase End
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -82,17 +82,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
-
-        Element element = new Element("title2", "Gra", false, "Rock");
-        elementViewModel.createFirebaseElement(element);
-
-        elementViewModel.getFirebaseElements().observe(this, elements ->
-        {
-           // firebaseFilterList = new ArrayList<>();
-           // firebaseFilterList.addAll(elements);
-            Log.d("xkanapka", "FIREBASE elements size " + elements.size());
-            adapter.setElementList(elements);
-        });
     }
 
     @Override
@@ -119,7 +108,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             case R.id.addF:
                 Element element = new Element("Hello", "Film", true, "Rock");
-                //elementViewModel.createFirebaseElement(element);
+                elementViewModel.createFirebaseElement(element);
+                return true;
+            case R.id.deleteRoom:
+                elementViewModel.deleteAllElements();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -139,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Log.d("Bufor", "_FILTER_ Size Elements "+elements.size() + " in onSharedPreferenceChanged/FilterElement/Observe");
             adapter.setElementList(elements);
         });
+
     }
 
     @Override

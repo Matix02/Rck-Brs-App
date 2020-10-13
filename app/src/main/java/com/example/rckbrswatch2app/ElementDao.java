@@ -36,12 +36,15 @@ public interface ElementDao {
     @Query("select * from Element")
     Flowable<List<Element>> getElements();
 
-
     @Query("SELECT * \n" +
             "FROM Element\n" +
             "ORDER BY id\n" +
             "DESC LIMIT 1")
     int getLastIndex();
+
+    @Query("DELETE \n" +
+            "FROM Element" )
+    void deleteAllElements();
     /*////////////////////////////////////////////////////
     // OFFLINE //
     ////////////////////////////////////////////////////
