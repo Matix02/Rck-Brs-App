@@ -42,19 +42,49 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        adapter = new ElementAdapter();
+        adapter = new ElementAdapter(MainActivity.this);
         recyclerView.setAdapter(adapter);
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
         long startTime = System.currentTimeMillis();
+
+        //Room
+        elementViewModel.getAllElements().observe(this, elements1 -> {
+            Log.d("RoomDB", "ROOM elements size " + elements1.size());
+            elementList.clear();
+            elementList.addAll(elements1);
+            Log.d("RoomDB", "ROOM after stream elements size " + elementList.size());
+
+            //Firebase
+            elementViewModel.getFirebaseElements().observe(this, elements -> {
+                firebaseFilterList = new ArrayList<>();
+                firebaseFilterList.addAll(elements);
+                Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
+                elementViewModel.deleteAllElements();
+                for(int i=0; i<elements.size();  i++){
+                    if(firebaseFilterList.get(i).getTitle().equals(elementList.get(i).getTitle())) {
+                        
+                        elementViewModel.createElement(elements.get(i));
+
+                    }
+                    else{
+                        elementViewModel.createElement(elements.get(i));
+
+                    }
+                }
+            });
+            //Room
+            adapter.setElementList(firebaseFilterList);
+
+        });
+
+
         //Firebase
-        elementViewModel.getFirebaseElements().observe(this, elements ->
-        {
+     /*   elementViewModel.getFirebaseElements().observe(this, elements -> {
              firebaseFilterList = new ArrayList<>();
              firebaseFilterList.addAll(elements);
              Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
              adapter.setElementList(firebaseFilterList);
-
             elementViewModel.deleteAllElements();
             for(int i=0; i<elements.size();  i++){
 
@@ -72,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 // filterList();
             });
         });
-
+*/
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
         Log.d("TimeBufor", "Time is " + duration+" ms");

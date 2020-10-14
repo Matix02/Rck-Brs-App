@@ -1,12 +1,12 @@
 package com.example.rckbrswatch2app;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,10 +18,14 @@ import java.util.SplittableRandom;
 public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> {
 
     private List<Element> elementList = new ArrayList<>();
+    private OnItemClickListener listener;
     //Mój szajs
-    int randomWithMathRandom ;
-    SplittableRandom splittableRandom = new SplittableRandom();
     MainActivity mainActivity;
+
+    public ElementAdapter(MainActivity mainActivity){
+
+        this.mainActivity = mainActivity;
+    }
 
     @NonNull
     @Override
@@ -29,7 +33,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.element_item, parent, false);
         return new ElementHolder(itemView);
-        //test
     }
 
     @Override
@@ -38,15 +41,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         holder.textViewTitle.setText(element.getTitle());
         holder.textViewCategory.setText(element.getCategory());
         holder.checkBoxWatch.setChecked(element.isWatched());
-
-        holder.checkBoxWatch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-Log.d("Bufor", "CHECKBOXWATCH");
-            }
-        });
     }
-
     @Override
     public int getItemCount() {
         return elementList.size();
@@ -61,22 +56,33 @@ Log.d("Bufor", "CHECKBOXWATCH");
         return elementList.get(position);
     }
 
-
-
-    static class ElementHolder extends RecyclerView.ViewHolder {
+    class ElementHolder extends RecyclerView.ViewHolder {
 
         private TextView textViewTitle;
         private TextView textViewCategory;
         private CheckBox checkBoxWatch;
-
         public ElementHolder(@NonNull View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.titleTV);
             textViewCategory = itemView.findViewById(R.id.categoryTV);
             checkBoxWatch = itemView.findViewById(R.id.watchCB);
 
+            checkBoxWatch.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                    Element element = elementList.get(position);
+                    Log.d("Bufor", "ONCHECKBOX before is " + element.isWatched());
 
+                    element.setWatched(!element.isWatched());
+                    mainActivity.elementViewModel.updateElement(element);
+                    Log.d("Bufor", "ONCHECKBOX after is " + element.isWatched());
 
+            });
         }
+    }
+    public interface OnItemClickListener{
+        void onItemClick(Element element);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 }
