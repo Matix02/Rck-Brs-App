@@ -191,9 +191,7 @@ public class ElementRoomRepository {
                 .filter(element -> {
                     if(element.getCategory().equals("Film")&&state)
                         return true;
-                    else if (element.getCategory().equals("Gra")&&!state)
-                        return true;
-                    return false;
+                    else return element.getCategory().equals("Gra") && !state;
                 })
         .subscribeWith(new DisposableObserver<Element>() {
             @Override

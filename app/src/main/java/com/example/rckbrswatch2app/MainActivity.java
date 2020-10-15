@@ -44,69 +44,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         adapter = new ElementAdapter(MainActivity.this);
         recyclerView.setAdapter(adapter);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
         long startTime = System.currentTimeMillis();
 
-        //Room
-        elementViewModel.getAllElements().observe(this, elements1 -> {
-            Log.d("RoomDB", "ROOM elements size " + elements1.size());
-            elementList.clear();
-            elementList.addAll(elements1);
-            Log.d("RoomDB", "ROOM after stream elements size " + elementList.size());
-
-            //Firebase
-            elementViewModel.getFirebaseElements().observe(this, elements -> {
-                firebaseFilterList = new ArrayList<>();
-                firebaseFilterList.addAll(elements);
-                Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
-                elementViewModel.deleteAllElements();
-                for(int i=0; i<elements.size();  i++){
-                    if(firebaseFilterList.get(i).getTitle().equals(elementList.get(i).getTitle())) {
-                        
-                        elementViewModel.createElement(elements.get(i));
-
-                    }
-                    else{
-                        elementViewModel.createElement(elements.get(i));
-
-                    }
-                }
-            });
-            //Room
-            adapter.setElementList(firebaseFilterList);
-
-        });
-
-
-        //Firebase
-     /*   elementViewModel.getFirebaseElements().observe(this, elements -> {
+        elementViewModel.getFirebaseElements().observe(this, elements -> {
              firebaseFilterList = new ArrayList<>();
              firebaseFilterList.addAll(elements);
              Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
              adapter.setElementList(firebaseFilterList);
-            elementViewModel.deleteAllElements();
-            for(int i=0; i<elements.size();  i++){
-
-                elementViewModel.createElement(elements.get(i));
-            }
             // elementViewModel.updateList(firebaseFilterList);
-            //Room
-            elementViewModel.getAllElements().observe(this, elements1 -> {
-                Log.d("RoomDB", "ROOM elements size " + elements1.size());
-                elementList.clear();
-                elementList.addAll(elements1);
-                Log.d("RoomDB", "ROOM after stream elements size " + elementList.size());
-                adapter.setElementList(firebaseFilterList);
-
-                // filterList();
-            });
+            // filterList();
         });
-*/
+
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
         Log.d("TimeBufor", "Time is " + duration+" ms");
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -121,6 +75,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
+    }
+
+    public void filterList(){
+        gameState = sharedPreferences.getBoolean("GameList", false);
+
+        elementViewModel.filterElement(elementFilterList, gameState).observe(this, elements -> {
+            Log.d("Bufor", "_FILTER_ Size Elements " + elements.size() + " in onSharedPreferenceChanged/FilterElement/Observe");
+            adapter.setElementList(elements);
+        });
     }
 
     @Override
@@ -160,17 +123,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         filterList();
-    }
-    public void filterList(){
-        elementFilterList = new ArrayList<>();
-        gameState = sharedPreferences.getBoolean("GameList", false);
-        elementFilterList.addAll(elementList);
-
-        elementViewModel.filterElement(elementFilterList, gameState).observe(this, elements -> {
-            Log.d("Bufor", "_FILTER_ Size Elements "+elements.size() + " in onSharedPreferenceChanged/FilterElement/Observe");
-            adapter.setElementList(elements);
-        });
-
     }
 
     @Override

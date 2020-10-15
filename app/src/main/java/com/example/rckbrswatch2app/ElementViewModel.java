@@ -28,14 +28,10 @@ public class ElementViewModel extends AndroidViewModel {
         firebaseRepository = new FirebaseRepository();
     }
 
-   public LiveData<List<Element>> getFirebaseElements(){
-        Log.d("Bufor", "FIREBASE LiveDATA");
-        return firebaseRepository.readFirebaseElements();
-    }
+    public LiveData<List<Element>> getFirebaseElements(){ return firebaseRepository.readFirebaseElements(); }
     public void createFirebaseElement(Element element){
         firebaseRepository.createFirebaseElement(element);
     }
-    //Koniec Mojego szajus
 
     public LiveData<List<Element>> getAllElements() { return elementLiveData; }
 
