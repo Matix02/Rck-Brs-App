@@ -49,14 +49,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
         long startTime = System.currentTimeMillis();
 
-        elementViewModel.getFirebaseElements().observe(this, elements -> {
+       /* elementViewModel.getFirebaseElements().observe(this, elements -> {
              firebaseFilterList = new ArrayList<>();
              firebaseFilterList.addAll(elements);
              Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
              adapter.setElementList(firebaseFilterList);
             // elementViewModel.updateList(firebaseFilterList);
             // filterList();
-        });
+        }); */
+       elementViewModel.readFirestore();
 
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);

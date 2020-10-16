@@ -28,7 +28,7 @@ public class ElementViewModel extends AndroidViewModel {
         firebaseRepository = new FirebaseRepository();
     }
 
-    public LiveData<List<Element>> getFirebaseElements(){ return firebaseRepository.readFirebaseElements(); }
+  //  public LiveData<List<Element>> getFirebaseElements(){ return firebaseRepository.readFirebaseElements(); }
     public void createFirebaseElement(Element element){
         firebaseRepository.createFirebaseElement(element);
     }
@@ -38,6 +38,7 @@ public class ElementViewModel extends AndroidViewModel {
   /*  public void createElement(int id, String title, String category, String share, boolean isWatched) {
         elementRoomRepository.createElement(id, title, category, share, isWatched);
     }*/
+    public void readFirestore (){ firebaseRepository.readFirestoreElements(); }
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
     {
         Log.d("Bufor", "Filter !!!");

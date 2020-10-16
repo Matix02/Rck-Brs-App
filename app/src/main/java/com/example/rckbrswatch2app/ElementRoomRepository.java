@@ -94,6 +94,7 @@ public class ElementRoomRepository {
 
         return elementLiveFirebaseData;
     }
+
     public void createElement(Element element) {
         compositeDisposable.add(Completable.fromAction(() -> elementDao.addElement(element))
                 .subscribeOn(Schedulers.io())
@@ -165,6 +166,7 @@ public class ElementRoomRepository {
                 })
         );
     }
+
     public void deleteAllElements() {
         compositeDisposable.add(Completable.fromAction(() -> elementDao.deleteAllElements())
                 .subscribeOn(Schedulers.io())
