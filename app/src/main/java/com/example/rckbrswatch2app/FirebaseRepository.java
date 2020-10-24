@@ -34,11 +34,11 @@ public class FirebaseRepository {
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
     }
+
     public void readFirestoreElements(){
         mFirestoreElement.collection("Elements")
                 .whereEqualTo("category", "serial")
                 .whereEqualTo("share", "Rock")
-
                 .get().addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
@@ -46,7 +46,7 @@ public class FirebaseRepository {
                             Log.d("Firestore", "Firestore data => " + documentSnapshot.getData());
                         }
                     } else {
-                        Log.d("Firesotre", "! Firestore error == " + task.getException());
+                        Log.d("Firesotre", "! Firestore error = " + task.getException());
                     }
                 });
     }
