@@ -43,10 +43,10 @@ public class FirebaseRepository {
                     if(task.isSuccessful()){
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
                         {
-                            Log.d("Firestore", "Firestore data => " + documentSnapshot.getData());
+                            Log.d("Firestore2", "Firestore data => " + documentSnapshot.getData());
                         }
                     } else {
-                        Log.d("Firesotre", "! Firestore error = " + task.getException());
+                        Log.d("Firesotre2", "! Firestore error = " + task.getException());
                     }
                 });
     }
