@@ -63,5 +63,34 @@ public class Element {
 
     public void setShare(String recom) { this.share = recom; }
 }
+class WatchElement{
+    private String id;
+    private boolean isWatched;
+
+    public WatchElement(){}
+    public WatchElement(String id, boolean isWatched) {
+        this.id = id;
+        this.isWatched = isWatched;
+    }
+    public WatchElement(boolean isWatched){
+        this.isWatched = isWatched;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public void setWatched(boolean watched) {
+        isWatched = watched;
+    }
+}
 
 

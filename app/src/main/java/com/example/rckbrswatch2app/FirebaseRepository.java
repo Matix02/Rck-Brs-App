@@ -12,9 +12,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.model.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +33,14 @@ public class FirebaseRepository {
     //Moj szajs
     private CompositeDisposable compositeDisposable=new CompositeDisposable();
     private FirebaseFirestore mFirestoreElement;
+    private MutableLiveData<List<Boolean>> isWatchedLiveData = new MutableLiveData<>();
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
     }
 
-    public void readFirestoreElements(){
+    public MutableLiveData<List<Element>> readFirestoreElements(){
+        elementList = new ArrayList<>();
         mFirestoreElement.collection("Elements")
                 .whereEqualTo("category", "serial")
                 .whereEqualTo("share", "Rock")
@@ -44,11 +49,40 @@ public class FirebaseRepository {
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
                         {
                             Log.d("Firestore2", "Firestore data => " + documentSnapshot.getData());
+                            elementList.add(documentSnapshot.toObject(Element.class));
                         }
+                        Log.d("Firestore2", "Firestore data/size => " + elementList.size());
+
+                        elementLiveData.postValue(elementList);
+
                     } else {
                         Log.d("Firesotre2", "! Firestore error = " + task.getException());
                     }
-                });
+                }
+                );
+        return elementLiveData;
+    }
+    public MutableLiveData<List<Boolean>> readUserFavElementsDocument(){
+        DocumentReference dR = mFirestoreElement.collection("WatchCollection").document("4");
+        List<Boolean> watchList = new ArrayList<>();
+        dR.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                DocumentSnapshot document = task.getResult();
+                assert document != null;
+                if(document.exists()) {
+                    for(int i=1; i<= Objects.requireNonNull(document.getData()).size();i++ ) {
+                        String nameElement = "Element" + i;
+                      //  Log.d("Firesotre2", "! Firestore boolean" + i + " is = " + document.getBoolean(nameElement));
+                        watchList.add(document.getBoolean(nameElement));
+                    }
+                    isWatchedLiveData.postValue(watchList);
+                   // Log.d("Firesotre2", "! Firestore size boolean = " + watchList.size());
+                } else
+                    Log.d("Firesotre2", "! Firestore error = " + task.getException());
+            } else
+                Log.d("Firesotre2", "! Firestore error = " + task.getException());
+        });
+        return isWatchedLiveData;
     }
     public MutableLiveData<List<Element>> readFirebaseElements(){
         elementList = new ArrayList<>();
@@ -72,6 +106,7 @@ public class FirebaseRepository {
         });
         return elementLiveData;
     }
+
 
     public void createFirebaseElement(Element element){ mReferenceElement.push().setValue(element); }
 }

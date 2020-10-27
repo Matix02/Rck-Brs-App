@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     List<Element> elementFilterList;
     boolean gameState;
     List<Element> firebaseFilterList;
-
+    List<Boolean> isWatchedList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,8 +57,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // elementViewModel.updateList(firebaseFilterList);
             // filterList();
         }); */
-       elementViewModel.readFirestore();
+       elementViewModel.readFirestore().observe(this , elements -> {
+           firebaseFilterList = new ArrayList<>();
+           firebaseFilterList.addAll(elements);
+           Log.d("Firebase", "Main firebase Elements size is " + firebaseFilterList.size());
+       });
+       elementViewModel.readFavDocumentFirestore().observe(this, booleans -> {
+           isWatchedList = new ArrayList<>();
+           isWatchedList.addAll(booleans);
+           Log.d("Firebase", "Main firebase Boolean size is " + isWatchedList.size());
 
+       });
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
         Log.d("TimeBufor", "Time is " + duration+" ms");

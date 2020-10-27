@@ -38,12 +38,20 @@ public class ElementViewModel extends AndroidViewModel {
   /*  public void createElement(int id, String title, String category, String share, boolean isWatched) {
         elementRoomRepository.createElement(id, title, category, share, isWatched);
     }*/
-    public void readFirestore (){ firebaseRepository.readFirestoreElements(); }
+    //*********************FirestoreOperations //////////////*******************
+
+    public LiveData<List<Boolean>> readFavDocumentFirestore (){ return  firebaseRepository.readUserFavElementsDocument(); }
+    public LiveData<List<Element>> readFirestore (){ return firebaseRepository.readFirestoreElements(); }
+
+
+
+    //*********************FirestoreOperations //////////////*******************
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
     {
         Log.d("Bufor", "Filter !!!");
         return elementRoomRepository.filterList(elements, gamestate);
     }
+
     public LiveData<List<Element>> updateList(List<Element> elements){ return  elementRoomRepository.equalData(elements); }
 
     public void createElement(Element element) {
