@@ -70,6 +70,7 @@ public class FirebaseRepository {
                 DocumentSnapshot document = task.getResult();
                 assert document != null;
                 if(document.exists()) {
+                    //com
                     for(int i=1; i<= Objects.requireNonNull(document.getData()).size();i++ ) {
                         String nameElement = "Element" + i;
                       //  Log.d("Firesotre2", "! Firestore boolean" + i + " is = " + document.getBoolean(nameElement));
