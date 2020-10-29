@@ -42,7 +42,7 @@ public class ElementViewModel extends AndroidViewModel {
 
     public LiveData<List<Boolean>> readFavDocumentFirestore (){ return  firebaseRepository.readUserFavElementsDocument(); }
     public LiveData<List<Element>> readFirestore (){ return firebaseRepository.readFirestoreElements(); }
-
+    public void addDocument(){ firebaseRepository.addDocument(); }
 
 
     //*********************FirestoreOperations //////////////*******************

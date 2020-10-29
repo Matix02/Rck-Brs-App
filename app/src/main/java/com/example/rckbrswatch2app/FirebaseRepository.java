@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,7 +22,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.model.Document;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -41,9 +45,7 @@ public class FirebaseRepository {
 
     public MutableLiveData<List<Element>> readFirestoreElements(){
         elementList = new ArrayList<>();
-        mFirestoreElement.collection("Elements")
-                .whereEqualTo("category", "serial")
-                .whereEqualTo("share", "Rock")
+        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc").collection("Lista")
                 .get().addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
@@ -58,8 +60,7 @@ public class FirebaseRepository {
                     } else {
                         Log.d("Firesotre2", "! Firestore error = " + task.getException());
                     }
-                }
-                );
+                });
         return elementLiveData;
     }
     public MutableLiveData<List<Boolean>> readUserFavElementsDocument(){
@@ -108,6 +109,21 @@ public class FirebaseRepository {
         return elementLiveData;
     }
 
+    public void addDocument(){
+        Map<String, Object> data = new HashMap<>();
+        data.put("title", "Mr.Robot");
+        data.put("isWatched", "true");
+        data.put("share", "Brs");
+        data.put("category", "Serial");
 
-    public void createFirebaseElement(Element element){ mReferenceElement.push().setValue(element); }
+
+        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc")
+                .collection("Lista")
+                .add(data)
+                .addOnSuccessListener(documentReference -> Log.d("FirestoreADD ", "! Firestore added successfully"))
+                .addOnFailureListener(e -> Log.d("FirestoreADD ", "! Firestore error = " + e));
+    }
+    public void createFirebaseElement(Element element){
+        mReferenceElement.push().setValue(element);
+    }
 }

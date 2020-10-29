@@ -119,8 +119,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 startActivity(intent);
                 return true;
             case R.id.addF:
-                Element element = new Element("Hello", "Film", true, "Rock");
-                elementViewModel.createFirebaseElement(element);
+                //Element element = new Element("Hello", "Film", true, "Rock");
+               // elementViewModel.createFirebaseElement(element);
+                elementViewModel.addDocument();
                 return true;
             case R.id.deleteRoom:
                 elementViewModel.deleteAllElements();
