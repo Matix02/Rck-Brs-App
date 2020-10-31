@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -14,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -39,6 +42,8 @@ public class FirebaseRepository {
     private FirebaseFirestore mFirestoreElement;
     private MutableLiveData<List<Boolean>> isWatchedLiveData = new MutableLiveData<>();
 
+
+
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
     }
@@ -46,7 +51,8 @@ public class FirebaseRepository {
     public MutableLiveData<List<Element>> readFirestoreElements(){
         elementList = new ArrayList<>();
         mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc").collection("Lista")
-                .get().addOnCompleteListener(task -> {
+                .get()
+                .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
                         {
@@ -63,6 +69,9 @@ public class FirebaseRepository {
                 });
         return elementLiveData;
     }
+
+
+
     public MutableLiveData<List<Boolean>> readUserFavElementsDocument(){
         DocumentReference dR = mFirestoreElement.collection("WatchCollection").document("4");
         List<Boolean> watchList = new ArrayList<>();
@@ -86,6 +95,7 @@ public class FirebaseRepository {
         });
         return isWatchedLiveData;
     }
+
     public MutableLiveData<List<Element>> readFirebaseElements(){
         elementList = new ArrayList<>();
         Query query = mReferenceElement.orderByChild("category").equalTo("Gra");
@@ -116,14 +126,30 @@ public class FirebaseRepository {
         data.put("share", "Brs");
         data.put("category", "Serial");
 
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("email", "DSASd@wp.pl");
+        userData.put("name", "Tetrix02");
+        userData.put("password", "1234567");
 
-        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc")
-                .collection("Lista")
-                .add(data)
-                .addOnSuccessListener(documentReference -> Log.d("FirestoreADD ", "! Firestore added successfully"))
-                .addOnFailureListener(e -> Log.d("FirestoreADD ", "! Firestore error = " + e));
+        CollectionReference reference = mFirestoreElement.collection("Users");
+
+
+        Log.d("Firestore","MainElementList size " + elementList.size());
+
+        Map<String, Object> result = elementList.stream().collect(
+                Collectors.toMap(Element::getCategory, Element::getShare)
+        );
+
+        Task<DocumentReference> referenceTask = reference.add(userData);
+        referenceTask.addOnSuccessListener(documentReference -> {
+            String d = documentReference.getId();
+            reference.document(d).collection("Lista").add(data)
+            .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać kolekcji List'y i jej elementów"));
+        })
+        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));
     }
-    public void createFirebaseElement(Element element){
+
+    public void createFirebaseElement(Element element) {
         mReferenceElement.push().setValue(element);
     }
 }
