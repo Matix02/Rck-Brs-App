@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import java.util.concurrent.Executors;
 
 
-@Database(entities = {Element.class}, version = 1)
+@Database(entities = {Element.class}, version = 2)
 public abstract class ElementDatabase extends RoomDatabase {
 
     private static ElementDatabase instace;

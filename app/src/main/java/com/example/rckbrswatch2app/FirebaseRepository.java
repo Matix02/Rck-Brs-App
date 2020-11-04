@@ -120,6 +120,60 @@ public class FirebaseRepository {
     }
 
     public void addDocument(){
+        Element element = new Element("THX11", "Film", false, "Other", "New");
+
+        Map<String, Object> elementData = new HashMap<>();
+        elementData.put("title", element.getTitle());
+        elementData.put("category", element.getCategory());
+        elementData.put("share", element.getShare());
+        elementData.put("isWatched", element.isWatched());
+
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("email", "DSASd@wp.pl");
+        userData.put("name", "Tetrix02");
+        userData.put("password", "1234567");
+
+        mFirestoreElement.collection("News").add(element);
+       /* CollectionReference reference = mFirestoreElement.collection("Users");
+
+        Task<DocumentReference> referenceTask = reference.add(userData);
+        referenceTask.addOnSuccessListener(documentReference -> {
+            String d = documentReference.getId();
+            CollectionReference collectionReference = reference.document(d).collection("Lista");
+            for(Element e: elementList){
+                collectionReference.add(e)
+                .addOnFailureListener(f -> Log.d("Firestore", "Nie udało się zrobić pętli by dodać wszystko"));
+            }
+        })
+        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
+    }
+    public void addCompletelyNewElement(){
+        Element element = new Element("Wściekłe Psy", "Film", false, "Borys");
+        //Pobieranie UserId itd.
+        String userID = "hjGb7smtlF4kjzvaYFnl";
+        mFirestoreElement.collection("Users").document(userID).collection("Lista").add(element);
+
+    }
+
+    public void addElement(Element element){
+
+
+    }
+
+    public void createFirebaseElement(Element element) {
+        mReferenceElement.push().setValue(element);
+    }
+   /*
+   !!! Dodawanie Dokumentów !!!
+    public void addDocument(){
+        Element element = new Element("THX", "Film", false, "Other");
+
+        Map<String, Object> elementData = new HashMap<>();
+        elementData.put("title", element.getTitle());
+        elementData.put("category", element.getCategory());
+        elementData.put("share", element.getShare());
+        elementData.put("isWatched", element.isWatched());
+
         Map<String, Object> data = new HashMap<>();
         data.put("title", "Mr.Robot");
         data.put("isWatched", "true");
@@ -134,22 +188,13 @@ public class FirebaseRepository {
         CollectionReference reference = mFirestoreElement.collection("Users");
 
 
-        Log.d("Firestore","MainElementList size " + elementList.size());
-
-        Map<String, Object> result = elementList.stream().collect(
-                Collectors.toMap(Element::getCategory, Element::getShare)
-        );
-
         Task<DocumentReference> referenceTask = reference.add(userData);
         referenceTask.addOnSuccessListener(documentReference -> {
             String d = documentReference.getId();
-            reference.document(d).collection("Lista").add(data)
-            .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać kolekcji List'y i jej elementów"));
+            reference.document(d).collection("Lista")
+                    .add(elementData)
+                    .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać kolekcji List'y i jej elementów"));
         })
-        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));
-    }
-
-    public void createFirebaseElement(Element element) {
-        mReferenceElement.push().setValue(element);
-    }
+                .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));
+    }*/
 }

@@ -12,6 +12,7 @@ public class Element {
     private String title;
     private String category;
     private boolean isWatched;
+    private String state;
 
     Element() {}
 
@@ -21,7 +22,6 @@ public class Element {
         this.isWatched = isWatched;
         this.share = share;
     }
-
     public Element(long id, String title, String category, boolean isWatched, String share) {
         this.id = id;
         this.title = title;
@@ -29,7 +29,21 @@ public class Element {
         this.isWatched = isWatched;
         this.share = share;
     }
-
+    public Element(String title, String category, boolean isWatched, String share, String state) {
+        this.title = title;
+        this.category = category;
+        this.isWatched = isWatched;
+        this.share = share;
+        this.state = state;
+    }
+    public Element(long id, String title, String category, boolean isWatched, String share, String state) {
+        this.id = id;
+        this.title = title;
+        this.category = category;
+        this.isWatched = isWatched;
+        this.share = share;
+        this.state = state;
+    }
 
     public long getId() { return id; }
 
@@ -62,35 +76,10 @@ public class Element {
     public String getShare() { return share; }
 
     public void setShare(String recom) { this.share = recom; }
-}
-class WatchElement{
-    private String id;
-    private boolean isWatched;
 
-    public WatchElement(){}
-    public WatchElement(String id, boolean isWatched) {
-        this.id = id;
-        this.isWatched = isWatched;
-    }
-    public WatchElement(boolean isWatched){
-        this.isWatched = isWatched;
-    }
+    public String getState(){ return state; }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public boolean isWatched() {
-        return isWatched;
-    }
-
-    public void setWatched(boolean watched) {
-        isWatched = watched;
-    }
+    public void setState(String state) {this.state = state; }
 }
 
 
