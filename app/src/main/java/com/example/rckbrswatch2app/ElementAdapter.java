@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
@@ -23,7 +25,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     MainActivity mainActivity;
 
     public ElementAdapter(MainActivity mainActivity){
-
         this.mainActivity = mainActivity;
     }
 
@@ -41,6 +42,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         holder.textViewTitle.setText(element.getTitle());
         holder.textViewCategory.setText(element.getCategory());
         holder.checkBoxWatch.setChecked(element.isWatched());
+        holder.textViewShare.setText(element.getShare());
     }
     @Override
     public int getItemCount() {
@@ -61,11 +63,14 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         private TextView textViewTitle;
         private TextView textViewCategory;
         private CheckBox checkBoxWatch;
+        private TextView textViewShare;
+
         public ElementHolder(@NonNull View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.titleTV);
             textViewCategory = itemView.findViewById(R.id.categoryTV);
             checkBoxWatch = itemView.findViewById(R.id.watchCB);
+            textViewShare = itemView.findViewById(R.id.shareTV);
 
             checkBoxWatch.setOnClickListener(v -> {
                 int position = getAdapterPosition();

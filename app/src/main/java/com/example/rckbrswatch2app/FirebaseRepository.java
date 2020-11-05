@@ -42,6 +42,7 @@ public class FirebaseRepository {
     private FirebaseFirestore mFirestoreElement;
     private MutableLiveData<List<Boolean>> isWatchedLiveData = new MutableLiveData<>();
 
+    private List<Element> newsList;
 
 
     public FirebaseRepository() {
@@ -120,7 +121,8 @@ public class FirebaseRepository {
     }
 
     public void addDocument(){
-        Element element = new Element("THX11", "Film", false, "Other", "New");
+        //Dodawanie od Admina, przekazać na FAB'a
+        Element element = new Element("Ku jezioru", "Film", false, "Borys", "New");
 
         Map<String, Object> elementData = new HashMap<>();
         elementData.put("title", element.getTitle());
@@ -134,6 +136,7 @@ public class FirebaseRepository {
         userData.put("password", "1234567");
 
         mFirestoreElement.collection("News").add(element);
+
        /* CollectionReference reference = mFirestoreElement.collection("Users");
 
         Task<DocumentReference> referenceTask = reference.add(userData);
@@ -153,6 +156,24 @@ public class FirebaseRepository {
         String userID = "hjGb7smtlF4kjzvaYFnl";
         mFirestoreElement.collection("Users").document(userID).collection("Lista").add(element);
 
+    }
+    public void getNews() {
+        //Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez
+        newsList = new ArrayList<>();
+        mFirestoreElement.collection("News")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
+                        {
+                            Log.d("Firestore2", "News data => " + documentSnapshot.getData());
+                            newsList.add(documentSnapshot.toObject(Element.class));
+                        }
+                        Log.d("Firestore2", "News data/size => " + newsList.size());
+                    } else {
+                        Log.d("Firesotre2", "! News error = " + task.getException());
+                    }
+                });
     }
 
     public void addElement(Element element){
