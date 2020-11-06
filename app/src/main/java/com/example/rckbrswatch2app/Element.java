@@ -44,7 +44,11 @@ public class Element {
         this.share = share;
         this.state = state;
     }
-
+    public Element(String title, String category, String share){
+        this.title = title;
+        this.category = category;
+        this.share = share;
+    }
     public long getId() { return id; }
 
     public void setId(long id) { this.id = id; }

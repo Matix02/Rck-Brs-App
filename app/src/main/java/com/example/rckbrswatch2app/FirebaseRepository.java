@@ -156,6 +156,8 @@ public class FirebaseRepository {
         String userID = "hjGb7smtlF4kjzvaYFnl";
         mFirestoreElement.collection("Users").document(userID).collection("Lista").add(element);
 
+
+
     }
     public void getNews() {
         //Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez
@@ -179,6 +181,9 @@ public class FirebaseRepository {
     public void addElement(Element element){
 
 
+    }
+    public void updateElement(Element element){
+        mFirestoreElement.collection("Users").
     }
 
     public void createFirebaseElement(Element element) {
