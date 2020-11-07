@@ -43,6 +43,7 @@ public class FirebaseRepository {
     private MutableLiveData<List<Boolean>> isWatchedLiveData = new MutableLiveData<>();
 
     private List<Element> newsList;
+    private List<Boolean> booleanList;
 
 
     public FirebaseRepository() {
@@ -51,21 +52,24 @@ public class FirebaseRepository {
 
     public MutableLiveData<List<Element>> readFirestoreElements(){
         elementList = new ArrayList<>();
-        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc").collection("Lista")
-                .get()
+        /*
+        ścieżka do listy danego użytkownika - pomysł #1
+        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc").collection("Lista") */
+        mFirestoreElement.collection("ElementsTest")
+        .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
                         {
-                            Log.d("Firestore2", "Firestore data => " + documentSnapshot.getData());
+                            Log.d("Firestore2", "FirestoreTest data => " + documentSnapshot.getData());
                             elementList.add(documentSnapshot.toObject(Element.class));
                         }
-                        Log.d("Firestore2", "Firestore data/size => " + elementList.size());
+                        Log.d("Firestore2", "FirestoreTest data/size => " + elementList.size());
 
                         elementLiveData.postValue(elementList);
 
                     } else {
-                        Log.d("Firesotre2", "! Firestore error = " + task.getException());
+                        Log.d("Firesotre2", "! FirestoreTest error = " + task.getException());
                     }
                 });
         return elementLiveData;
@@ -137,8 +141,20 @@ public class FirebaseRepository {
 
         mFirestoreElement.collection("News").add(element);
 
-       /* CollectionReference reference = mFirestoreElement.collection("Users");
+        /*
+        1.Rejestracja:
+            a) dodanie do tabeli UserTest - emaila, name'a, passworda
+            b) w tym dokumencie przechowywujemy IdDokumentu i dodajemy kolecję Oglądane
+            c) w doc "Oglądane" dodajemy rekordy xElementsSize - tyle ile jest kolekcji "ElementsTest"
+            d) wszystkie muszą:
+                - mieć to samo id
+                - pole ma nazywać się isWatched
+                - być typu boolean
+            e)
+         */
 
+       /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu
+       CollectionReference reference = mFirestoreElement.collection("Users");
         Task<DocumentReference> referenceTask = reference.add(userData);
         referenceTask.addOnSuccessListener(documentReference -> {
             String d = documentReference.getId();
@@ -160,8 +176,32 @@ public class FirebaseRepository {
 
     }
     public void getNews() {
-        //Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez
-        newsList = new ArrayList<>();
+        booleanList = new ArrayList<>();
+        Map<String, Object> booleanMap = new HashMap<>();
+        // Zwraca listę oglądanych Id i Oglądanych IsWatched danego użytkownika
+        String userID = "1";
+        mFirestoreElement.collection("UsersTest").document("1").collection("Oglądane").document("5")
+                .get()
+                .addOnCompleteListener(documentSnapshot -> {
+                    
+                    Log.d("Firestore2", "News/Boolean data/size => " + booleanMap.size());
+                         /*   if (documentSnapshot.isSuccessful()) {
+                                for(QueryDocumentSnapshot document : Objects.requireNonNull(documentSnapshot.getResult()))
+                                {
+                                    Log.d("Firestore2", "News/Boolean data => " + document.getData());
+                                    booleanMap.put(document.getData().toString(), document.getData());
+                                }
+                                   // booleanList.addAll(documentSnapshot1.getData());
+                                   // booleanMap.putAll(Objects.requireNonNull(documentSnapshot1.getData()));
+                             //   Log.d("Firestore2", "News/Boolean data/size => " + booleanList.size());
+                            } else {
+                                Log.d("Firesotre2", "! News error = " + documentSnapshot.getException());
+                            }*/
+                });
+    }
+
+        /*
+        Zwraca tabelę News'ów. Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez(...)
         mFirestoreElement.collection("News")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -175,15 +215,16 @@ public class FirebaseRepository {
                     } else {
                         Log.d("Firesotre2", "! News error = " + task.getException());
                     }
-                });
-    }
+                });*/
+
 
     public void addElement(Element element){
 
 
     }
     public void updateElement(Element element){
-        mFirestoreElement.collection("Users").
+        mFirestoreElement.collection("Users");
+
     }
 
     public void createFirebaseElement(Element element) {

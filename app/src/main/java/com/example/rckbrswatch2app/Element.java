@@ -84,6 +84,23 @@ public class Element {
     public String getState(){ return state; }
 
     public void setState(String state) {this.state = state; }
+
+}
+class Watched{
+    private boolean isWatched;
+
+    public Watched(boolean isWatched) {
+        this.isWatched = isWatched;
+    }
+
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public void setWatched(boolean watched) {
+        isWatched = watched;
+    }
+
 }
 
 
