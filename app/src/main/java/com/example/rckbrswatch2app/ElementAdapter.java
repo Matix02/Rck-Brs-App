@@ -14,13 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SplittableRandom;
 
 public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> {
 
     private List<Element> elementList = new ArrayList<>();
     private OnItemClickListener listener;
+
     //Mój szajs
     MainActivity mainActivity;
 
@@ -80,7 +83,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
                     element.setWatched(!element.isWatched());
                     mainActivity.elementViewModel.updateElement(element);
                     Log.d("Bufor", "ONCHECKBOX after is " + element.isWatched());
-
             });
         }
     }

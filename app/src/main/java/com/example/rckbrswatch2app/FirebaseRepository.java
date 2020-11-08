@@ -5,10 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,15 +16,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.model.Document;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -36,15 +29,12 @@ public class FirebaseRepository {
     private DatabaseReference mReferenceElement;
     private List<Element> elementList;
     private MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
-
     //Moj szajs
     private CompositeDisposable compositeDisposable=new CompositeDisposable();
     private FirebaseFirestore mFirestoreElement;
     private MutableLiveData<List<Boolean>> isWatchedLiveData = new MutableLiveData<>();
-
     private List<Element> newsList;
     private List<Boolean> booleanList;
-
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -52,11 +42,9 @@ public class FirebaseRepository {
 
     public MutableLiveData<List<Element>> readFirestoreElements(){
         elementList = new ArrayList<>();
-        /*
-        ścieżka do listy danego użytkownika - pomysł #1
-        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc").collection("Lista") */
-        mFirestoreElement.collection("ElementsTest")
-        .get()
+
+        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc").collection("Lista")
+                .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
@@ -67,15 +55,12 @@ public class FirebaseRepository {
                         Log.d("Firestore2", "FirestoreTest data/size => " + elementList.size());
 
                         elementLiveData.postValue(elementList);
-
                     } else {
                         Log.d("Firesotre2", "! FirestoreTest error = " + task.getException());
                     }
                 });
         return elementLiveData;
     }
-
-
 
     public MutableLiveData<List<Boolean>> readUserFavElementsDocument(){
         DocumentReference dR = mFirestoreElement.collection("WatchCollection").document("4");
@@ -141,19 +126,7 @@ public class FirebaseRepository {
 
         mFirestoreElement.collection("News").add(element);
 
-        /*
-        1.Rejestracja:
-            a) dodanie do tabeli UserTest - emaila, name'a, passworda
-            b) w tym dokumencie przechowywujemy IdDokumentu i dodajemy kolecję Oglądane
-            c) w doc "Oglądane" dodajemy rekordy xElementsSize - tyle ile jest kolekcji "ElementsTest"
-            d) wszystkie muszą:
-                - mieć to samo id
-                - pole ma nazywać się isWatched
-                - być typu boolean
-            e)
-         */
-
-       /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu
+       /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu */
        CollectionReference reference = mFirestoreElement.collection("Users");
         Task<DocumentReference> referenceTask = reference.add(userData);
         referenceTask.addOnSuccessListener(documentReference -> {
@@ -164,44 +137,20 @@ public class FirebaseRepository {
                 .addOnFailureListener(f -> Log.d("Firestore", "Nie udało się zrobić pętli by dodać wszystko"));
             }
         })
-        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
+        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));
     }
     public void addCompletelyNewElement(){
         Element element = new Element("Wściekłe Psy", "Film", false, "Borys");
         //Pobieranie UserId itd.
         String userID = "hjGb7smtlF4kjzvaYFnl";
         mFirestoreElement.collection("Users").document(userID).collection("Lista").add(element);
-
-
-
     }
     public void getNews() {
-        booleanList = new ArrayList<>();
+        newsList = new ArrayList<>();
         Map<String, Object> booleanMap = new HashMap<>();
         // Zwraca listę oglądanych Id i Oglądanych IsWatched danego użytkownika
         String userID = "1";
-        mFirestoreElement.collection("UsersTest").document("1").collection("Oglądane").document("5")
-                .get()
-                .addOnCompleteListener(documentSnapshot -> {
-                    
-                    Log.d("Firestore2", "News/Boolean data/size => " + booleanMap.size());
-                         /*   if (documentSnapshot.isSuccessful()) {
-                                for(QueryDocumentSnapshot document : Objects.requireNonNull(documentSnapshot.getResult()))
-                                {
-                                    Log.d("Firestore2", "News/Boolean data => " + document.getData());
-                                    booleanMap.put(document.getData().toString(), document.getData());
-                                }
-                                   // booleanList.addAll(documentSnapshot1.getData());
-                                   // booleanMap.putAll(Objects.requireNonNull(documentSnapshot1.getData()));
-                             //   Log.d("Firestore2", "News/Boolean data/size => " + booleanList.size());
-                            } else {
-                                Log.d("Firesotre2", "! News error = " + documentSnapshot.getException());
-                            }*/
-                });
-    }
-
-        /*
-        Zwraca tabelę News'ów. Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez(...)
+        /*Zwraca tabelę News'ów. Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez(...)*/
         mFirestoreElement.collection("News")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -215,16 +164,53 @@ public class FirebaseRepository {
                     } else {
                         Log.d("Firesotre2", "! News error = " + task.getException());
                     }
-                });*/
+                });
+       /*  NotActual-outdated Plan:
+        1.Rejestracja:
+            a) dodanie do tabeli UserTest - emaila, name'a, passworda
+            b) w tym dokumencie przechowywujemy IdDokumentu i dodajemy kolecję Oglądane
+            c) w doc "Oglądane" dodajemy rekordy xElementsSize - tyle ile jest kolekcji "ElementsTest"
+            d) wszystkie muszą:
+                - mieć to samo id
+                - pole ma nazywać się isWatched
+                - być typu boolean
+            e)
 
+       NieUdany eksperyment związany w osobną tabelę dla każdego użytkownika, gdzie miałby rozpiskę co oglądał, a czego nie
+       mFirestoreElement.collection("UsersTest").document("2").collection("Oglądane").document("1")
+                .get()
+                .addOnCompleteListener(documentSnapshot -> {
+                    if(documentSnapshot.isSuccessful()){
+                        DocumentSnapshot documentSnapshot1 = documentSnapshot.getResult();
+                        assert documentSnapshot1 != null;
+                        if(documentSnapshot1.exists()){
+                            Log.d("Firestore", "Data => " + documentSnapshot1.getData());
+                            booleanMap.putAll(Objects.requireNonNull(documentSnapshot1.getData()));
+                            Log.d("Firestore", "Data => " + booleanMap.size());
+                        }
+                    }*/
+                    //Log.d("Firestore2", "News/Boolean data/size => " + booleanMap.size());
+                         /*   if (documentSnapshot.isSuccessful()) {
+                                for(QueryDocumentSnapshot document : Objects.requireNonNull(documentSnapshot.getResult()))
+                                {
+                                    Log.d("Firestore2", "News/Boolean data => " + document.getData());
+                                    booleanMap.put(document.getData().toString(), document.getData());
+                                }
+                                   // booleanList.addAll(documentSnapshot1.getData());
+                                   // booleanMap.putAll(Objects.requireNonNull(documentSnapshot1.getData()));
+                             //   Log.d("Firestore2", "News/Boolean data/size => " + booleanList.size());
+                            } else {
+                                Log.d("Firesotre2", "! News error = " + documentSnapshot.getException());
+                            }
+                });*/
+    }
 
     public void addElement(Element element){
 
-
     }
+
     public void updateElement(Element element){
         mFirestoreElement.collection("Users");
-
     }
 
     public void createFirebaseElement(Element element) {
