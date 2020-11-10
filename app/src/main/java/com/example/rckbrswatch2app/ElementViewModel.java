@@ -42,9 +42,13 @@ public class ElementViewModel extends AndroidViewModel {
 
     public LiveData<List<Boolean>> readFavDocumentFirestore (){ return  firebaseRepository.readUserFavElementsDocument(); }
     public LiveData<List<Element>> readFirestore (){ return firebaseRepository.readFirestoreElements(); }
+    public LiveData<List<Element>> getNewsCollection(){ return firebaseRepository.getNews(); }
+
     public void addDocument(){ firebaseRepository.addDocument(); }
     public void getNews(){ firebaseRepository.getNews(); }
 
+    public void getFilterDataNews() { firebaseRepository.filterNews(); }
+    public void getLastnNewLogin() { firebaseRepository.getDate(); }
     //*********************FirestoreOperations //////////////*******************
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
     {

@@ -1,8 +1,10 @@
 package com.example.rckbrswatch2app;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.Task;
@@ -14,10 +16,19 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +45,7 @@ public class FirebaseRepository {
     private FirebaseFirestore mFirestoreElement;
     private MutableLiveData<List<Boolean>> isWatchedLiveData = new MutableLiveData<>();
     private List<Element> newsList;
-    private List<Boolean> booleanList;
+    private MutableLiveData<List<Element>> newsElementLiveData = new MutableLiveData<>();
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -123,6 +134,8 @@ public class FirebaseRepository {
         userData.put("email", "DSASd@wp.pl");
         userData.put("name", "Tetrix02");
         userData.put("password", "1234567");
+        userData.put("NewLogin", FieldValue.serverTimestamp());
+        userData.put("LastLogin", FieldValue.serverTimestamp());
 
         mFirestoreElement.collection("News").add(element);
 
@@ -131,6 +144,7 @@ public class FirebaseRepository {
         Task<DocumentReference> referenceTask = reference.add(userData);
         referenceTask.addOnSuccessListener(documentReference -> {
             String d = documentReference.getId();
+
             CollectionReference collectionReference = reference.document(d).collection("Lista");
             for(Element e: elementList){
                 collectionReference.add(e)
@@ -145,26 +159,32 @@ public class FirebaseRepository {
         String userID = "hjGb7smtlF4kjzvaYFnl";
         mFirestoreElement.collection("Users").document(userID).collection("Lista").add(element);
     }
-    public void getNews() {
-        newsList = new ArrayList<>();
+    public MutableLiveData<List<Element>> getNews() {
         Map<String, Object> booleanMap = new HashMap<>();
         // Zwraca listę oglądanych Id i Oglądanych IsWatched danego użytkownika
         String userID = "1";
         /*Zwraca tabelę News'ów. Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez(...)*/
-        mFirestoreElement.collection("News")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
-                        for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
-                        {
-                            Log.d("Firestore2", "News data => " + documentSnapshot.getData());
-                            newsList.add(documentSnapshot.toObject(Element.class));
-                        }
-                        Log.d("Firestore2", "News data/size => " + newsList.size());
-                    } else {
-                        Log.d("Firesotre2", "! News error = " + task.getException());
+
+        mFirestoreElement.collection("News").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if(error != null){
+                    Log.d("Firestore", "News Listener is DEAD");
+                    return;
+                }
+
+                newsList = new ArrayList<>();
+                assert value != null;
+                for(QueryDocumentSnapshot documentSnapshot : value)
+                    {
+                        Log.d("Firestore2", "News data => " + documentSnapshot.getData());
+                        newsList.add(documentSnapshot.toObject(Element.class));
                     }
-                });
+                    newsElementLiveData.postValue(newsList);
+                    Log.d("Firestore2", "News data/size => " + newsList.size());
+                }
+        });
+        return newsElementLiveData;
        /*  NotActual-outdated Plan:
         1.Rejestracja:
             a) dodanie do tabeli UserTest - emaila, name'a, passworda
@@ -205,8 +225,55 @@ public class FirebaseRepository {
                 });*/
     }
 
-    public void addElement(Element element){
+    public void getDate(){
+        //Zwracanie dat logowania użytkownika (aktualnego i poprzedniego zalogowania)
+        String userID = "mENkJn3iyIQDIqSh3cRc";
+        mFirestoreElement.collection("Users").document(userID)
+                .get()
+                .addOnCompleteListener(document ->{
+                    if (document.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = document.getResult();
+                        assert documentSnapshot != null;
+                        if (documentSnapshot.exists()) {
+                          Calendar lastLogin = Calendar.getInstance();
+                          lastLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
+                          Calendar newLogin = Calendar.getInstance();
+                          newLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("NewLogin")));
+                          //Date date = new Calendar(String.valueOf(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
+                          Log.d("Firestore", "LastLogin -> " + Objects.requireNonNull(document.getResult()).getDate("LastLogin"));
+                          Log.d("Firestore", "NewLogin -> " + Objects.requireNonNull(document.getResult()).getDate("NewLogin"));
+                        }
+                        else
+                            Log.d("Firestore", "LoginTime error - No Such Document");
+                    } else
+                        Log.d("Firestore", "LoginTime error with " + document.getException());
+                });
+    }
 
+    public void filterNews(){
+        //Zwraca dane elementy z tabeli NEWS, które są starsze od daty dzisiejszej lub nowsze
+        Long time = System.currentTimeMillis()/1000;
+
+        Date creationDate = new Date();
+        Log.d("Firestore", "% ActuailDate => " + creationDate);
+        Date lastTimeLogUser = new Date(2020, 11, 10);
+        Calendar.Builder cal = new Calendar.Builder().setDate(2020, 11, 9);
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd-M-YYYY hh:mm:ss");
+       // Date date = sdf.parse();
+//        String calendar = new GregorianCalendar(2020, 10, 10).toZonedDateTime().format(DateTimeFormatter.ofPattern("ddd MMM MM HH:mm:ss GMT yyyy"));
+
+        Log.d("Firestore", "Current TIme is " + time.toString());
+        mFirestoreElement.collection("News")
+                .whereGreaterThan("time", creationDate)
+        .get()
+        .addOnCompleteListener(command -> {
+            if(command.isSuccessful()){
+                for (QueryDocumentSnapshot document : Objects.requireNonNull(command.getResult()))
+                    Log.d("Firestore", "% FilterData => " + document.getDate("time"));
+            }
+            else
+                Log.d("Firestore", "% FilterData error");
+        });
     }
 
     public void updateElement(Element element){

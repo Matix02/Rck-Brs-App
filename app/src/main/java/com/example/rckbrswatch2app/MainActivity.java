@@ -1,5 +1,6 @@
 package com.example.rckbrswatch2app;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +17,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FieldValue;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +34,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     List<Element> elementFilterList;
     boolean gameState;
     List<Element> firebaseFilterList;
+    List<Element> firebaseNewsList;
     List<Boolean> isWatchedList;
+    static int counterNews = 0;
+    static int counterData = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,12 +64,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // elementViewModel.updateList(firebaseFilterList);
             // filterList();
         }); */
-       elementViewModel.readFirestore().observe(this , elements -> {
-           firebaseFilterList = new ArrayList<>();
-           firebaseFilterList.addAll(elements);
-           Log.d("Firebase", "Main firebase Elements size is " + firebaseFilterList.size());
-           adapter.setElementList(firebaseFilterList);
-       });
+
 
        elementViewModel.readFavDocumentFirestore().observe(this, booleans -> {
            isWatchedList = new ArrayList<>();
@@ -70,7 +72,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
            Log.d("Firebase", "Main firebase Boolean size is " + isWatchedList.size());
 
        });
-       elementViewModel.getNews();
+        elementViewModel.readFirestore().observe(this , elementsList -> {
+            firebaseFilterList = new ArrayList<>();
+            firebaseFilterList.addAll(elementsList);
+            Log.d("Firebase", "Main firebase Elements size is " + firebaseFilterList.size());
+            adapter.setElementList(firebaseFilterList);
+            Log.d("Firestore", "#CounterData is " + counterData++);
+            elementViewModel.getNewsCollection().observe(this, elements -> {
+                firebaseNewsList = new ArrayList<>();
+                firebaseNewsList.addAll(elements);
+                Log.d("Firestore", "MainActivity firebaseNews size is " + firebaseNewsList.size());
+                Log.d("Firestore", "#CounterNews is " + counterNews++);
+
+            });
+        });
+
+        elementViewModel.getFilterDataNews();
+        elementViewModel.getLastnNewLogin();
 
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
