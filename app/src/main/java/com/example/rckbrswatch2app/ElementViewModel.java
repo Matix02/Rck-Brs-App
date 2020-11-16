@@ -49,6 +49,8 @@ public class ElementViewModel extends AndroidViewModel {
 
     public void getFilterDataNews() { firebaseRepository.filterNews(); }
     public void getLastnNewLogin() { firebaseRepository.getDate(); }
+
+    public void setActiveUserLogin() { firebaseRepository.setTimeLogin(); }
     //*********************FirestoreOperations //////////////*******************
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
     {

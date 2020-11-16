@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         elementViewModel.getFilterDataNews();
         elementViewModel.getLastnNewLogin();
+        elementViewModel.setActiveUserLogin();
 
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);

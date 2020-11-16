@@ -46,6 +46,8 @@ public class FirebaseRepository {
     private MutableLiveData<List<Boolean>> isWatchedLiveData = new MutableLiveData<>();
     private List<Element> newsList;
     private MutableLiveData<List<Element>> newsElementLiveData = new MutableLiveData<>();
+    private String userID = "mENkJn3iyIQDIqSh3cRc";
+
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -227,7 +229,6 @@ public class FirebaseRepository {
 
     public void getDate(){
         //Zwracanie dat logowania użytkownika (aktualnego i poprzedniego zalogowania)
-        String userID = "mENkJn3iyIQDIqSh3cRc";
         mFirestoreElement.collection("Users").document(userID)
                 .get()
                 .addOnCompleteListener(document ->{
@@ -254,8 +255,10 @@ public class FirebaseRepository {
         //Zwraca dane elementy z tabeli NEWS, które są starsze od daty dzisiejszej lub nowsze
         Long time = System.currentTimeMillis()/1000;
 
+        //Definicja aktualnej daty
         Date creationDate = new Date();
-        Log.d("Firestore", "% ActuailDate => " + creationDate);
+        Log.d("Firestore", "% ActuallDate => " + creationDate);
+
         Date lastTimeLogUser = new Date(2020, 11, 10);
         Calendar.Builder cal = new Calendar.Builder().setDate(2020, 11, 9);
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd-M-YYYY hh:mm:ss");
@@ -264,15 +267,45 @@ public class FirebaseRepository {
 
         Log.d("Firestore", "Current TIme is " + time.toString());
         mFirestoreElement.collection("News")
-                .whereGreaterThan("time", creationDate)
+                .whereLessThan("time", creationDate)
         .get()
         .addOnCompleteListener(command -> {
-            if(command.isSuccessful()){
+            if(command.isSuccessful()) {
                 for (QueryDocumentSnapshot document : Objects.requireNonNull(command.getResult()))
                     Log.d("Firestore", "% FilterData => " + document.getDate("time"));
             }
             else
                 Log.d("Firestore", "% FilterData error");
+        });
+    }
+    public void setTimeLogin(){
+        //Aktualizuje podane dane, wraz z możliwością dostoswania ilości pól, i akutalizacji daty na tą aktualną w normalnym formacie
+        Date creationDate = new Date();
+        Calendar lastLogin = Calendar.getInstance();
+        Log.d("Firestore", "% ActuallDate => " + creationDate);
+        mFirestoreElement.collection("Users").document(userID)
+                .get()
+                .addOnCompleteListener(document ->{
+                    if (document.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = document.getResult();
+                        assert documentSnapshot != null;
+                        if (documentSnapshot.exists()) {
+                            lastLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
+                            Calendar newLogin = Calendar.getInstance();
+                            newLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("NewLogin")));
+                        }
+                        else
+                            Log.d("Firestore", "LoginTime error - No Such Document");
+                    } else
+                        Log.d("Firestore", "LoginTime error with " + document.getException());
+                });
+        mFirestoreElement.collection("Users").document(userID)
+                .update("LastLogin", lastLogin.getTime(), "name", "Saddness")
+                .addOnSuccessListener(document ->{
+                            Log.d("Firestore", "$$$ Edit Login Successful");
+                        })
+                .addOnFailureListener(failed -> {
+                    Log.d("Firestore", "$$$ Edit Login Failed" + failed);
         });
     }
 
