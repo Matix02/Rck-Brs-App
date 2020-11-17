@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.Task;
@@ -22,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +49,11 @@ public class FirebaseRepository {
     private List<Element> newsList;
     private MutableLiveData<List<Element>> newsElementLiveData = new MutableLiveData<>();
     private String userID = "mENkJn3iyIQDIqSh3cRc";
-
+    //Date Category
+    private Calendar lastLogin = Calendar.getInstance();
+    private MutableLiveData<Calendar> lastMutableLogin = new MutableLiveData<>();
+    private Calendar newLogin = Calendar.getInstance();
+    private Date lastLoginDate = new Date();
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -236,9 +242,9 @@ public class FirebaseRepository {
                         DocumentSnapshot documentSnapshot = document.getResult();
                         assert documentSnapshot != null;
                         if (documentSnapshot.exists()) {
-                          Calendar lastLogin = Calendar.getInstance();
-                          lastLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
-                          Calendar newLogin = Calendar.getInstance();
+                         //   lastLogin = Calendar.getInstance();
+                            lastLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
+                          //newLogin = Calendar.getInstance();
                           newLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("NewLogin")));
                           //Date date = new Calendar(String.valueOf(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
                           Log.d("Firestore", "LastLogin -> " + Objects.requireNonNull(document.getResult()).getDate("LastLogin"));
@@ -250,7 +256,45 @@ public class FirebaseRepository {
                         Log.d("Firestore", "LoginTime error with " + document.getException());
                 });
     }
+    private Calendar getNewLogin() {
+        Calendar trueForm = Calendar.getInstance();
+        mFirestoreElement.collection("Users").document(userID)
+                .get()
+                .addOnCompleteListener(document ->{
+                    if (document.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = document.getResult();
+                        assert documentSnapshot != null;
+                        if (documentSnapshot.exists()) {
+                            newLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("NewLogin")));
+                            Log.d("Firestore", "LastLogin from Personal Inner Function -> " + newLogin.getTime());
+                        } else
+                            Log.d("Firestore", "LoginTime error - No Such Document");
 
+                    } else
+                        Log.d("Firestore", "LoginTime error with " + document.getException());
+                });
+        Log.d("Firestore", "MUTABLE NewLogin from PersonalFunction -> ");
+        return null;
+    }
+    private Calendar getLastLogin() {
+        mFirestoreElement.collection("Users").document(userID)
+                .get()
+                .addOnCompleteListener(document ->{
+                    if (document.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = document.getResult();
+                        assert documentSnapshot != null;
+                        if (documentSnapshot.exists()) {
+                            lastLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
+                            Log.d("Firestore", "LastLogin from Personal Inner Function -> " + lastLogin.getTime());
+
+                        }else
+                            Log.d("Firestore", "LoginTime error - No Such Document");
+                    } else
+                        Log.d("Firestore", "LoginTime error with " + document.getException());
+                });
+        Log.d("Firestore", "LastLogin from PersonalFunction -> " + lastLogin.getTime());
+        return lastLogin;
+    }
     public void filterNews(){
         //Zwraca dane elementy z tabeli NEWS, które są starsze od daty dzisiejszej lub nowsze
         Long time = System.currentTimeMillis()/1000;
@@ -279,34 +323,42 @@ public class FirebaseRepository {
         });
     }
     public void setTimeLogin(){
+        transTime();
         //Aktualizuje podane dane, wraz z możliwością dostoswania ilości pól, i akutalizacji daty na tą aktualną w normalnym formacie
-        Date creationDate = new Date();
-        Calendar lastLogin = Calendar.getInstance();
-        Log.d("Firestore", "% ActuallDate => " + creationDate);
-        mFirestoreElement.collection("Users").document(userID)
-                .get()
-                .addOnCompleteListener(document ->{
-                    if (document.isSuccessful()) {
-                        DocumentSnapshot documentSnapshot = document.getResult();
-                        assert documentSnapshot != null;
-                        if (documentSnapshot.exists()) {
-                            lastLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("LastLogin")));
-                            Calendar newLogin = Calendar.getInstance();
-                            newLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("NewLogin")));
-                        }
-                        else
-                            Log.d("Firestore", "LoginTime error - No Such Document");
-                    } else
-                        Log.d("Firestore", "LoginTime error with " + document.getException());
+    }
+    public void transTime(){
+        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
+
+        mFirestoreElement.runTransaction(transaction -> {
+            Date actualDate = new Date();
+            DocumentSnapshot snapshot = transaction.get(userLogRef);
+            Date newUserLoginTime = snapshot.getDate("NewLogin");
+            transaction.update(userLogRef, "LastLogin", newUserLoginTime, "NewLogin", actualDate);
+            return null;
+        })
+                .addOnSuccessListener(command -> {
+                    Log.d("Firestore", "Transaction success");
+                })
+                .addOnFailureListener(error -> {
+                    Log.d("Firestore", "Transaction failed because of " + error);
                 });
-        mFirestoreElement.collection("Users").document(userID)
-                .update("LastLogin", lastLogin.getTime(), "name", "Saddness")
-                .addOnSuccessListener(document ->{
-                            Log.d("Firestore", "$$$ Edit Login Successful");
-                        })
-                .addOnFailureListener(failed -> {
-                    Log.d("Firestore", "$$$ Edit Login Failed" + failed);
-        });
+    }
+    public void transList(){
+        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
+
+        mFirestoreElement.runTransaction(transaction -> {
+            Date actualDate = new Date();
+            DocumentSnapshot snapshot = transaction.get(userLogRef);
+            Date newUserLoginTime = snapshot.getDate("NewLogin");
+            transaction.update(userLogRef, "LastLogin", newUserLoginTime, "NewLogin", actualDate);
+            return null;
+        })
+                .addOnSuccessListener(command -> {
+                    Log.d("Firestore", "Transaction success");
+                })
+                .addOnFailureListener(error -> {
+                    Log.d("Firestore", "Transaction failed because of " + error);
+                });
     }
 
     public void updateElement(Element element){
