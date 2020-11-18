@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -51,9 +52,7 @@ public class FirebaseRepository {
     private String userID = "mENkJn3iyIQDIqSh3cRc";
     //Date Category
     private Calendar lastLogin = Calendar.getInstance();
-    private MutableLiveData<Calendar> lastMutableLogin = new MutableLiveData<>();
     private Calendar newLogin = Calendar.getInstance();
-    private Date lastLoginDate = new Date();
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -256,26 +255,7 @@ public class FirebaseRepository {
                         Log.d("Firestore", "LoginTime error with " + document.getException());
                 });
     }
-    private Calendar getNewLogin() {
-        Calendar trueForm = Calendar.getInstance();
-        mFirestoreElement.collection("Users").document(userID)
-                .get()
-                .addOnCompleteListener(document ->{
-                    if (document.isSuccessful()) {
-                        DocumentSnapshot documentSnapshot = document.getResult();
-                        assert documentSnapshot != null;
-                        if (documentSnapshot.exists()) {
-                            newLogin.setTime(Objects.requireNonNull(Objects.requireNonNull(document.getResult()).getDate("NewLogin")));
-                            Log.d("Firestore", "LastLogin from Personal Inner Function -> " + newLogin.getTime());
-                        } else
-                            Log.d("Firestore", "LoginTime error - No Such Document");
 
-                    } else
-                        Log.d("Firestore", "LoginTime error with " + document.getException());
-                });
-        Log.d("Firestore", "MUTABLE NewLogin from PersonalFunction -> ");
-        return null;
-    }
     private Calendar getLastLogin() {
         mFirestoreElement.collection("Users").document(userID)
                 .get()
@@ -295,35 +275,29 @@ public class FirebaseRepository {
         Log.d("Firestore", "LastLogin from PersonalFunction -> " + lastLogin.getTime());
         return lastLogin;
     }
+
     public void filterNews(){
         //Zwraca dane elementy z tabeli NEWS, które są starsze od daty dzisiejszej lub nowsze
-        Long time = System.currentTimeMillis()/1000;
 
-        //Definicja aktualnej daty
         Date creationDate = new Date();
-        Log.d("Firestore", "% ActuallDate => " + creationDate);
+        Log.d("FilterStore", "% ActuallDate => " + creationDate);
 
-        Date lastTimeLogUser = new Date(2020, 11, 10);
-        Calendar.Builder cal = new Calendar.Builder().setDate(2020, 11, 9);
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd-M-YYYY hh:mm:ss");
-       // Date date = sdf.parse();
-//        String calendar = new GregorianCalendar(2020, 10, 10).toZonedDateTime().format(DateTimeFormatter.ofPattern("ddd MMM MM HH:mm:ss GMT yyyy"));
+       /* mFirestoreElement.collection("News")
+                .whereGreaterThan("time", creationDate)
+                .get()
+                .addOnCompleteListener(command -> {
+                    if(command.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : Objects.requireNonNull(command.getResult()))
+                            Log.d("FilterStore", "NewsDataTable => " + document.getDate("time"));
 
-        Log.d("Firestore", "Current TIme is " + time.toString());
-        mFirestoreElement.collection("News")
-                .whereLessThan("time", creationDate)
-        .get()
-        .addOnCompleteListener(command -> {
-            if(command.isSuccessful()) {
-                for (QueryDocumentSnapshot document : Objects.requireNonNull(command.getResult()))
-                    Log.d("Firestore", "% FilterData => " + document.getDate("time"));
-            }
-            else
-                Log.d("Firestore", "% FilterData error");
-        });
+                    }
+                    else
+                        Log.d("FilterStore", "NewsDataTable error");
+                });*/
     }
     public void setTimeLogin(){
         transTime();
+
         //Aktualizuje podane dane, wraz z możliwością dostoswania ilości pól, i akutalizacji daty na tą aktualną w normalnym formacie
     }
     public void transTime(){
@@ -333,32 +307,105 @@ public class FirebaseRepository {
             Date actualDate = new Date();
             DocumentSnapshot snapshot = transaction.get(userLogRef);
             Date newUserLoginTime = snapshot.getDate("NewLogin");
-            transaction.update(userLogRef, "LastLogin", newUserLoginTime, "NewLogin", actualDate);
-            return null;
+           // transaction.update(userLogRef, "LastLogin", newUserLoginTime, "NewLogin", actualDate);
+            //Pamiętać o zrobieniu z tego nulla, bo i po co - return'a
+            return newUserLoginTime;
         })
                 .addOnSuccessListener(command -> {
-                    Log.d("Firestore", "Transaction success");
+                    Log.d("Firestore", "TransactionTime success ");
+
+                    transList();
                 })
                 .addOnFailureListener(error -> {
                     Log.d("Firestore", "Transaction failed because of " + error);
                 });
     }
-    public void transList(){
+    public void transList() {
         final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
+        final CollectionReference newsListRef = mFirestoreElement.collection("News");
 
         mFirestoreElement.runTransaction(transaction -> {
-            Date actualDate = new Date();
+            //Date Section
             DocumentSnapshot snapshot = transaction.get(userLogRef);
-            Date newUserLoginTime = snapshot.getDate("NewLogin");
-            transaction.update(userLogRef, "LastLogin", newUserLoginTime, "NewLogin", actualDate);
+            Date oldUserLoginTime = snapshot.getDate("LastLogin");
+            Log.d("Firestore", "TransactionList | NewLogin is " + oldUserLoginTime);
+            //NewsList Section
+            assert oldUserLoginTime != null;
+            newsListRef.whereGreaterThan("time", oldUserLoginTime)
+                    .get()
+                    .addOnCompleteListener(command -> {
+                        if(command.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(command.getResult())){
+                                Log.d("FilterStore", "TransactionNewsData - NewsDataTable => " + document.toObject(Element.class)); //Sprawdzić elementy w tym elemencie po przepisaniu
+                                Element element = document.toObject(Element.class);
+                                updateMainList(document, element);
+                            //Wywołanie innej transakcji, która będzie dodawać, edytować bądź usuwać elementy z NewsTable
+                        }}
+                        else
+                            Log.d("FilterStore", "TransactionNewsData - NewsDataTable error");
+                    });
             return null;
         })
                 .addOnSuccessListener(command -> {
-                    Log.d("Firestore", "Transaction success");
+                    Log.d("Firestore", "TransactionList success");
                 })
                 .addOnFailureListener(error -> {
                     Log.d("Firestore", "Transaction failed because of " + error);
                 });
+    }
+
+    public void updateMainList(QueryDocumentSnapshot document, Element element){
+      //  Element element = new Element(document.toObject(Element.class));
+      //  Element element1 = new Element(element.getTitle(), element.getCategory(), false, element.getShare());
+        String fieldType = (String) document.get("state");
+        String docId = document.getId();
+
+        //Dla Nowych Elementow
+            //Ta referencja tworzy odniesienie z losowo wygenerowanym ID dokumentu
+        final DocumentReference userListDocRef = mFirestoreElement.collection("Users").document(userID).collection("Lista").document(docId);
+
+        assert fieldType != null;
+        if(fieldType.equals("New"))
+            mFirestoreElement.runTransaction(transaction -> {
+              //  DocumentSnapshot snapshot = transaction.get(userListDocRef);
+                transaction.set(userListDocRef, element);
+                return null;
+            }).addOnSuccessListener(success ->{
+                Log.d("Firestore", "TransactionADD success");
+            })
+            .addOnFailureListener(error -> {
+                Log.d("Firestore", "TransactionADD failed = " + error);
+            });
+        else if (fieldType.equals("Delete"))
+             mFirestoreElement.runTransaction(transaction -> {
+                transaction.delete(userListDocRef);
+                 return null;
+             }).addOnSuccessListener(success ->{
+                 Log.d("Firestore", "TransactionDELETE success");
+             })
+                     .addOnFailureListener(error -> {
+                         Log.d("Firestore", "TransactionDELETE failed = " + error);
+                     });
+        else if (fieldType.equals("Update"))
+            mFirestoreElement.runTransaction(transaction -> {
+                transaction.update(userListDocRef, "title", element.getTitle());
+                transaction.update(userListDocRef, "share", element.getShare());
+                transaction.update(userListDocRef, "category", element.getCategory());
+
+                return null;
+            }).addOnSuccessListener(success ->{
+                Log.d("Firestore", "TransactionUPDATE success");
+            })
+                    .addOnFailureListener(error -> {
+                        Log.d("Firestore", "TransactionUPDATE failed = " + error);
+                    });
+
+
+     //   elementList.add(documentSnapshot.toObject(Element.class));
+
+
+
+
     }
 
     public void updateElement(Element element){

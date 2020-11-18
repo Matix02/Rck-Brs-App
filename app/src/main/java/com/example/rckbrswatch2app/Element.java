@@ -49,6 +49,10 @@ public class Element {
         this.category = category;
         this.share = share;
     }
+
+    public <T> Element(T toObject) {
+    }
+
     public long getId() { return id; }
 
     public void setId(long id) { this.id = id; }
