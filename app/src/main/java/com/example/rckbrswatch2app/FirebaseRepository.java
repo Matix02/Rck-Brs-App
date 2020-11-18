@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -53,6 +56,9 @@ public class FirebaseRepository {
     //Date Category
     private Calendar lastLogin = Calendar.getInstance();
     private Calendar newLogin = Calendar.getInstance();
+    //Random
+    private MutableLiveData<Element> randomElement = new MutableLiveData<>();
+
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -61,14 +67,15 @@ public class FirebaseRepository {
     public MutableLiveData<List<Element>> readFirestoreElements(){
         elementList = new ArrayList<>();
 
-        mFirestoreElement.collection("Users").document("WJolg7rxMmz9SFXfVwnc").collection("Lista")
+        mFirestoreElement.collection("Users").document(userID).collection("Lista")
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
                         {
                             Log.d("Firestore2", "FirestoreTest data => " + documentSnapshot.getData());
-                            elementList.add(documentSnapshot.toObject(Element.class));
+                            Element element = documentSnapshot.toObject(Element.class);
+                            elementList.add(element);
                         }
                         Log.d("Firestore2", "FirestoreTest data/size => " + elementList.size());
 
@@ -297,7 +304,6 @@ public class FirebaseRepository {
     }
     public void setTimeLogin(){
         transTime();
-
         //Aktualizuje podane dane, wraz z możliwością dostoswania ilości pól, i akutalizacji daty na tą aktualną w normalnym formacie
     }
     public void transTime(){
@@ -320,10 +326,12 @@ public class FirebaseRepository {
                     Log.d("Firestore", "Transaction failed because of " + error);
                 });
     }
+
     public void transList() {
         final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
         final CollectionReference newsListRef = mFirestoreElement.collection("News");
-
+        Log.d("DatabaseSize", "Size of this db in repository is " + elementList.size());
+        getRandomElement();
         mFirestoreElement.runTransaction(transaction -> {
             //Date Section
             DocumentSnapshot snapshot = transaction.get(userLogRef);
@@ -355,62 +363,119 @@ public class FirebaseRepository {
     }
 
     public void updateMainList(QueryDocumentSnapshot document, Element element){
-      //  Element element = new Element(document.toObject(Element.class));
-      //  Element element1 = new Element(element.getTitle(), element.getCategory(), false, element.getShare());
         String fieldType = (String) document.get("state");
         String docId = document.getId();
 
-        //Dla Nowych Elementow
-            //Ta referencja tworzy odniesienie z losowo wygenerowanym ID dokumentu
         final DocumentReference userListDocRef = mFirestoreElement.collection("Users").document(userID).collection("Lista").document(docId);
-
         assert fieldType != null;
-        if(fieldType.equals("New"))
-            mFirestoreElement.runTransaction(transaction -> {
-              //  DocumentSnapshot snapshot = transaction.get(userListDocRef);
-                transaction.set(userListDocRef, element);
-                return null;
-            }).addOnSuccessListener(success ->{
-                Log.d("Firestore", "TransactionADD success");
-            })
-            .addOnFailureListener(error -> {
-                Log.d("Firestore", "TransactionADD failed = " + error);
-            });
-        else if (fieldType.equals("Delete"))
-             mFirestoreElement.runTransaction(transaction -> {
-                transaction.delete(userListDocRef);
-                 return null;
-             }).addOnSuccessListener(success ->{
-                 Log.d("Firestore", "TransactionDELETE success");
-             })
-                     .addOnFailureListener(error -> {
-                         Log.d("Firestore", "TransactionDELETE failed = " + error);
-                     });
-        else if (fieldType.equals("Update"))
-            mFirestoreElement.runTransaction(transaction -> {
-                transaction.update(userListDocRef, "title", element.getTitle());
-                transaction.update(userListDocRef, "share", element.getShare());
-                transaction.update(userListDocRef, "category", element.getCategory());
+        switch (fieldType) {
+            case "New":
+                mFirestoreElement.runTransaction(transaction -> {
+                    //  DocumentSnapshot snapshot = transaction.get(userListDocRef);
+                    transaction.set(userListDocRef, element);
+                    return null;
+                }).addOnSuccessListener(success -> {
+                    Log.d("Firestore", "TransactionADD success");
+                })
+                        .addOnFailureListener(error -> {
+                            Log.d("Firestore", "TransactionADD failed = " + error);
+                        });
+                break;
+            case "Delete":
+                mFirestoreElement.runTransaction(transaction -> {
+                    transaction.delete(userListDocRef);
+                    return null;
+                }).addOnSuccessListener(success -> {
+                    Log.d("Firestore", "TransactionDELETE success");
+                })
+                        .addOnFailureListener(error -> {
+                            Log.d("Firestore", "TransactionDELETE failed = " + error);
+                        });
+                break;
+            case "Update":
+                mFirestoreElement.runTransaction(transaction -> {
+                    transaction.update(userListDocRef, "title", element.getTitle());
+                    transaction.update(userListDocRef, "share", element.getShare());
+                    transaction.update(userListDocRef, "category", element.getCategory());
 
-                return null;
-            }).addOnSuccessListener(success ->{
-                Log.d("Firestore", "TransactionUPDATE success");
-            })
-                    .addOnFailureListener(error -> {
-                        Log.d("Firestore", "TransactionUPDATE failed = " + error);
-                    });
+                    return null;
+                }).addOnSuccessListener(success -> {
+                    Log.d("Firestore", "TransactionUPDATE success");
+                })
+                        .addOnFailureListener(error -> {
+                            Log.d("Firestore", "TransactionUPDATE failed = " + error);
+                        });
+                break;
+        }
+    }
 
+    //Niedokończone, trzeba mieć podłączony backend - repository z UI
+    public void setWatchElement(Element element, boolean isWatched){
+        final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID).collection("Lista")
+                .document(/*potrzebny jest ID tego elementu*/);
 
-     //   elementList.add(documentSnapshot.toObject(Element.class));
-
-
-
+        mFirestoreElement.runTransaction(transaction -> {
+            transaction.update(listRef, "watched", isWatched);
+            return null;
+        })
+                .addOnSuccessListener(command -> {
+                    Log.d("Firestore", "UserTransactionIsWatched success");
+                })
+                .addOnFailureListener(error -> {
+                    Log.d("Firestore", "UserTransactionIsWatched failed because of " + error);
+                });
 
     }
 
-    public void updateElement(Element element){
-        mFirestoreElement.collection("Users");
+    public void deleteElement(Element element, String elementId){
+        //Usuwa z listy tego właśnie administratora
+        final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID).collection("Lista")
+                .document(/*brakuje ID ktory to dokument*/);
+
+        //Dodaje do tabeli News dla pozostałych User'ów o statusie User, żeby przy następnym otwarciu został ten element usunięty
+        final DocumentReference newsRef = mFirestoreElement.collection("News").document(/*musi być konkretny ID tego elementu*/);
+
+        mFirestoreElement.runTransaction(transaction -> {
+           transaction.delete(listRef);
+           transaction.set(newsRef, element);
+
+            return null;
+        })
+                .addOnSuccessListener(command -> {
+                    Log.d("Firestore", "AdminTransactionDelete success");
+                })
+                .addOnFailureListener(error -> {
+                    Log.d("Firestore", "AdminTransactionDelete failed because of " + error);
+                });
     }
+
+    public /*MutableLiveData<Element>*/void getRandomElement(){
+        final CollectionReference reference = mFirestoreElement.collection("Users").document(userID).collection("Lista");
+        String choosenCategory = "Gra";
+        Log.d("DatabaseSize", "ElementList Complete is " + elementList.size());
+        List<Element> checkList = new ArrayList<>(elementList);
+
+        List<Element> battleList = elementList.stream().filter(Element::isWatched).collect(Collectors.toList());
+        Log.d("DatabaseSize", "BattleList NoWatched is " + battleList.size());
+
+        reference.document().getId();
+
+
+
+
+        int randomIndex = ThreadLocalRandom.current().nextInt(0, elementList.size());
+        Log.d("Random", "Random number is " + randomIndex);
+
+
+        Element element = elementList.get(randomIndex);
+
+
+
+        Log.d("Firebase", "Random Element => " + element.getTitle());
+        /*return randomElement;*/
+    }
+
+
 
     public void createFirebaseElement(Element element) {
         mReferenceElement.push().setValue(element);

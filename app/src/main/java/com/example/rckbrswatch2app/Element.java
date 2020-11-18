@@ -11,11 +11,16 @@ public class Element {
     private String share;
     private String title;
     private String category;
-    private boolean isWatched;
+    public boolean isWatched;
     private String state;
 
     Element() {}
-
+    public Element(boolean isWatched, String share,String title, String category) {
+        this.title = title;
+        this.category = category;
+        this.isWatched = isWatched;
+        this.share = share;
+    }
     public Element(String title, String category, boolean isWatched, String share) {
         this.title = title;
         this.category = category;
@@ -48,6 +53,12 @@ public class Element {
         this.title = title;
         this.category = category;
         this.share = share;
+    }
+    public Element(String title, String category, String share, boolean isWatched){
+        this.title = title;
+        this.category = category;
+        this.share = share;
+        this.isWatched = isWatched;
     }
 
     public <T> Element(T toObject) {
