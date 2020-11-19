@@ -187,6 +187,7 @@ public class ElementRoomRepository {
 
     public MutableLiveData<List<Element>> filterList(final List<Element> elements, boolean state)
     {
+
         elementList = new ArrayList<>();
         compositeDisposable.add(Observable.fromArray(elements)
                 .flatMap((Function<List<Element>, Observable<Element>>) elements1 -> Observable.fromArray(elements1.toArray(new Element[0])))

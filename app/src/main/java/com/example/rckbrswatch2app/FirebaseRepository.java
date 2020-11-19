@@ -1,14 +1,13 @@
 package com.example.rckbrswatch2app;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,23 +23,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Transaction;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import io.reactivex.disposables.CompositeDisposable;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class FirebaseRepository {
     private DatabaseReference mReferenceElement;
@@ -58,7 +54,8 @@ public class FirebaseRepository {
     private Calendar newLogin = Calendar.getInstance();
     //Random
     private MutableLiveData<Element> randomElement = new MutableLiveData<>();
-
+    // Filter Share Preferences
+    SharedPreferences sharedPreferences;
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -66,8 +63,10 @@ public class FirebaseRepository {
 
     public MutableLiveData<List<Element>> readFirestoreElements(){
         elementList = new ArrayList<>();
+        //SharedPrefrence do zapisu i odczytu filtracji
 
         mFirestoreElement.collection("Users").document(userID).collection("Lista")
+              //  .whereEqualTo("category", "Gra")
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
@@ -79,6 +78,11 @@ public class FirebaseRepository {
                         }
                         Log.d("Firestore2", "FirestoreTest data/size => " + elementList.size());
 
+                        List<Element> sharedList = new ArrayList<>(elementList);
+                        Log.d("Firestore2", "ShareList BEFORE data/size => " + sharedList.size());
+                        sharedList = complementationList(sharedList, true, false, true, true,true,true,true,true,true,true);
+                        Log.d("Firestore2", "ShareList AFTER data/size => " + sharedList.size());
+                       // registerUser("Johnny", "silverhand@nightcity.pl", "Samurai");
                         elementLiveData.postValue(elementList);
                     } else {
                         Log.d("Firesotre2", "! FirestoreTest error = " + task.getException());
@@ -331,7 +335,7 @@ public class FirebaseRepository {
         final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
         final CollectionReference newsListRef = mFirestoreElement.collection("News");
         Log.d("DatabaseSize", "Size of this db in repository is " + elementList.size());
-        getRandomElement("gra");
+        getRandomElement("Gra");
         mFirestoreElement.runTransaction(transaction -> {
             //Date Section
             DocumentSnapshot snapshot = transaction.get(userLogRef);
@@ -449,6 +453,33 @@ public class FirebaseRepository {
                 });
     }
 
+    public void registerUser(String name, String email, String password){
+        final DocumentReference reference = mFirestoreElement.collection("Users").document();
+
+        /*Nie potrzeba (chyba) zabezpieczenia przed tworzeniem kont o tym samym loginie oraz Emailu
+        Można wtedy dodać return, że nie zadziało, bo taki email istnieje lub, hasło słabe i zwracane jest
+        przy pomocy właśnie tego reutrna, jak w dokumentacji.
+         */
+        mFirestoreElement.runTransaction(transaction -> {
+
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("name", name);
+            userData.put("email", email);
+            userData.put("password", password);
+
+            transaction.set(reference, userData);
+
+            return null;
+        })
+                .addOnSuccessListener(command -> {
+                    Log.d("Firestore", "Registration successfully");
+                })
+                .addOnFailureListener(error -> {
+                    Log.d("Firestore", "Registration failed because of " + error);
+                });
+
+
+    }
     public /*MutableLiveData<Element>*/void getRandomElement(String choosenCategory){
         final CollectionReference reference = mFirestoreElement.collection("Users").document(userID).collection("Lista");
         Log.d("DatabaseSize", "ElementList Complete is " + elementList.size());
@@ -474,6 +505,7 @@ public class FirebaseRepository {
                 filteredList = battleList.stream().filter(c -> c.getCategory().equals("Książka")).collect(Collectors.toList());
                 break;
         }
+            Log.d("Random", "Random and FilteredList (before Rnaomd) is " + filteredList.size());
             int randomIndex = ThreadLocalRandom.current().nextInt(0, filteredList.size());
             Log.d("Random", "Random number is " + randomIndex);
             Element element = filteredList.get(randomIndex);
@@ -493,7 +525,83 @@ public class FirebaseRepository {
 
         /*return randomElement;*/
     }
+    /* !!! Filtracja !!! */
+    public List<Element> complementationList(List<Element> elements, boolean finished, boolean unFinished, boolean books, boolean games, boolean series, boolean films,
+                                             boolean rock, boolean borys, boolean rockBorys, boolean others) {
 
+        List<Element> elementFilters = new ArrayList<>();
+
+        List<Element> completeList;
+
+       /* boolean finished = elementFilters.get(0).isFinished();
+        boolean unFinished = elementFilters.get(0).isUnFinished();
+        boolean books = elementFilters.get(0).isBookCategory();
+        boolean games = elementFilters.get(0).isGamesCategory();
+        boolean series = elementFilters.get(0).isSeriesCategory();
+        boolean films = elementFilters.get(0).isFilmCategory();
+        boolean rock = elementFilters.get(0).isRockRecommedation();
+        boolean borys = elementFilters.get(0).isBorysRecommedation();
+        boolean rockBorys = elementFilters.get(0).isRockBorysRecommedation();
+        boolean others = elementFilters.get(0).isOtherRecommedation();
+*/
+        //#1 Oglądane i Nieoglądane
+        if (finished && !unFinished)
+            completeList = elements.stream().filter(Element::isWatched).collect(Collectors.toList());
+        else if (!finished && unFinished)
+            completeList = elements.stream().filter(p -> !p.isWatched()).collect(Collectors.toList());
+        else
+            completeList = new ArrayList<>(elements);
+        //#2 Kategorie
+        elements.clear();
+        if (!games || !books || !series || !films) {
+            elements = categoryFilter(games, films, series, books, completeList);
+        } else {
+            elements = new ArrayList<>(completeList);
+        }
+        //#3 Polecane
+        completeList.clear();
+        if (!rock || !borys || !rockBorys || !others) {
+            completeList = promFilter(rock, borys, rockBorys, others, elements);
+        } else {
+            completeList = new ArrayList<>(elements);
+        }
+        return completeList;
+    }
+
+    List<Element> promFilter(boolean promRock, boolean promBorys, boolean promRockBorys, boolean others, List<Element> elements) {
+
+        List<Element> completePromList = new ArrayList<>();
+        //średnio wydajne pewnie
+        for (Element e : elements) {
+            if (e.getShare().equals("Rock") & promRock)
+                completePromList.add(e);
+            else if (e.getShare().equals("Borys") & promBorys)
+                completePromList.add(e);
+            else if (e.getShare().equals("Rck&Brs") & promRockBorys)
+                completePromList.add(e);
+            else if (e.getShare().equals("Inne") & others)
+                completePromList.add(e);
+        }
+        return completePromList;
+    }
+
+    List<Element> categoryFilter(boolean catGames, boolean catFilms, boolean catSeries, boolean catBooks, List<Element> elements) {
+
+        List<Element> completePromList = new ArrayList<>();
+        for (Element e : elements) {
+            if (e.getCategory().equals("Książka") & catBooks)
+                completePromList.add(e);
+            else if (e.getCategory().equals("Film") & catFilms)
+                completePromList.add(e);
+            else if (e.getCategory().equals("Gra") & catGames)
+                completePromList.add(e);
+            else if (e.getCategory().equals("Serial") & catSeries)
+                completePromList.add(e);
+        }
+        return completePromList;
+    }
+
+    /* !!! Koniec Filtracji !!! */
 
 
     public void createFirebaseElement(Element element) {
