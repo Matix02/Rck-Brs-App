@@ -331,7 +331,7 @@ public class FirebaseRepository {
         final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
         final CollectionReference newsListRef = mFirestoreElement.collection("News");
         Log.d("DatabaseSize", "Size of this db in repository is " + elementList.size());
-        getRandomElement();
+        getRandomElement("gra");
         mFirestoreElement.runTransaction(transaction -> {
             //Date Section
             DocumentSnapshot snapshot = transaction.get(userLogRef);
@@ -449,29 +449,48 @@ public class FirebaseRepository {
                 });
     }
 
-    public /*MutableLiveData<Element>*/void getRandomElement(){
+    public /*MutableLiveData<Element>*/void getRandomElement(String choosenCategory){
         final CollectionReference reference = mFirestoreElement.collection("Users").document(userID).collection("Lista");
-        String choosenCategory = "Gra";
         Log.d("DatabaseSize", "ElementList Complete is " + elementList.size());
-        List<Element> checkList = new ArrayList<>(elementList);
 
-        List<Element> battleList = elementList.stream().filter(Element::isWatched).collect(Collectors.toList());
+        List<Element> battleList = elementList.stream().filter(p -> !p.isWatched).collect(Collectors.toList());
         Log.d("DatabaseSize", "BattleList NoWatched is " + battleList.size());
+        List<Element> filteredList = new ArrayList<>();
 
-        reference.document().getId();
+        if (battleList.size() >= 1){
+        switch (choosenCategory){
+            case "Wszystko":
+                break;
+            case "Gra":
+                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Gra")).collect(Collectors.toList());
+                break;
+            case "Serial":
+                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Serial")).collect(Collectors.toList());
+                break;
+            case "Film":
+                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Film")).collect(Collectors.toList());
+                break;
+            case "Książka":
+                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Książka")).collect(Collectors.toList());
+                break;
+        }
+            int randomIndex = ThreadLocalRandom.current().nextInt(0, filteredList.size());
+            Log.d("Random", "Random number is " + randomIndex);
+            Element element = filteredList.get(randomIndex);
+            Log.d("Firebase", "Random Element => " + element.getTitle());
+        }
+        else
+            Log.d("Firebase", "There's NO Random Element");
+
+        /*Dodać jeszcze Default, chyba (w zależności od sposobu zwracanych elementów) lub blok try/catch, gdy mimo posiadania
+        elementów nieoglądniętych lub nieogranych to wyświetla się że brak danych na liście, bo uzytkownik nie posiada aktualnie
+        żadnych elementów z kategorii aktualnie wybranej.
+         */
+        //reference.document().getId();
 
 
 
 
-        int randomIndex = ThreadLocalRandom.current().nextInt(0, elementList.size());
-        Log.d("Random", "Random number is " + randomIndex);
-
-
-        Element element = elementList.get(randomIndex);
-
-
-
-        Log.d("Firebase", "Random Element => " + element.getTitle());
         /*return randomElement;*/
     }
 

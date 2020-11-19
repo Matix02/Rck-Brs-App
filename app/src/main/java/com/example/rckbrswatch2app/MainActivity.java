@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, SearchView.OnQueryTextListener{
 
     ElementViewModel elementViewModel;
     SharedPreferences sharedPreferences;
@@ -128,7 +129,29 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.main_menu, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.searchView);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+       // searchView.setIconifiedByDefault(false);
+       // searchView.setQuery("", false);
+
         return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        String userInput = newText.toLowerCase();
+        List<Element> searchedList = new ArrayList<>();
+
+        adapter.getFilter().filter(newText);
+
+        return false;
     }
 
     @Override
@@ -149,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case R.id.deleteRoom:
                 elementViewModel.deleteAllElements();
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

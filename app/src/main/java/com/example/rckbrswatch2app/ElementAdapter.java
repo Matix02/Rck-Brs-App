@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,14 +16,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SplittableRandom;
 
-public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> {
+public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> implements Filterable {
 
     private List<Element> elementList = new ArrayList<>();
+    private List<Element> elementListAll;
     private OnItemClickListener listener;
 
     //Mój szajs
@@ -54,12 +58,47 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
 
     public void setElementList(List<Element> elementList){
        this.elementList = elementList;
+       this.elementListAll = new ArrayList<>(elementList);
        notifyDataSetChanged();
     }
 
     public Element getElementAt(int position){
         return elementList.get(position);
     }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Element> fitleredList = new ArrayList<>();
+           // elementListAll.clear();
+           // elementListAll.addAll(elementList);
+            if (constraint.toString().isEmpty())
+                fitleredList.addAll(elementListAll);
+            else {
+                for (Element e: elementListAll){
+                    if(e.getTitle().toLowerCase().contains(constraint.toString().toLowerCase()))
+                        fitleredList.add(e);
+                }
+            }
+
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = fitleredList;
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            elementList.clear();
+           // setElementList((List<Element>) results.values);
+           elementList.addAll((Collection<? extends Element>) results.values);
+           notifyDataSetChanged();
+        }
+    };
 
     class ElementHolder extends RecyclerView.ViewHolder {
 
