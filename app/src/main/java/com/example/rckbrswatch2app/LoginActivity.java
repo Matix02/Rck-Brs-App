@@ -22,6 +22,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.firestore.auth.User;
+
+import java.util.logging.Handler;
 
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
@@ -50,16 +54,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mGoogleSingInClient = GoogleSignIn.getClient(this, gso);
 
         mAuth = FirebaseAuth.getInstance();
-
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-      //Nie działa -   updateUI(currentUser);
+        if (currentUser != null) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override
@@ -78,34 +83,35 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         if (requestCode == RC_SIGN_IN){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                assert account != null;
-                Log.d("GoogleLogin", "firebaseLogin:  " + account.getId());
-                firebaseAuthWithGoogle(account.getIdToken());
-            } catch (ApiException e) {
-                e.printStackTrace();
+            Exception exception = task.getException();
+            if (task.isSuccessful()){
+                try {
+                    GoogleSignInAccount account = task.getResult(ApiException.class);
+                    assert account != null;
+                    Log.d("GoogleLogin", "firebaseLogin:  " + account.getId());
+                    firebaseAuthWithGoogle(account.getIdToken());
+                } catch (ApiException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.w("SignInACtivity", exception);
             }
         }
-
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            Log.d("GoogleLogin", "GoogleLogin Successfully");
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()){
+                        Log.d("GoogleLogin", "GoogleLogin Successfully");
                         FirebaseUser user = mAuth.getCurrentUser();
-                        }
-                        else {
-                            Log.d("GoogleLogin", "GoogleLogin Failed because of " + task.getException());
-                        }
+                        Intent intent = new Intent(this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Log.d("GoogleLogin", "GoogleLogin Failed because of " + task.getException());
                     }
                 });
     }
-
-
 }
