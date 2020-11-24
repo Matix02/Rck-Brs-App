@@ -3,6 +3,7 @@ package com.example.rckbrswatch2app;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,10 +24,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.Transaction;
-import com.google.firebase.firestore.auth.User;
-
-import java.util.logging.Handler;
-
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -36,11 +33,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private FirebaseAuth mAuth;
 
     private GoogleSignInClient mGoogleSingInClient;
+    ElementViewModel elementViewModel;
+
+    static String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
 
         singInButton = (Button) findViewById(R.id.login);
         singInButton.setOnClickListener(this);
@@ -62,6 +64,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             Intent intent = new Intent(this, MainActivity.class);
+            Log.d("GoogleLogin", "firebaseLogin:  " + currentUser.getUid());
+            userID = currentUser.getUid();
+
+            intent.putExtra("userID", userID);
+           // elementViewModel.checkUser("aasdoajsdkj askw3ieq3e");
             startActivity(intent);
             finish();
         }
@@ -75,6 +82,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void signIn() {
         Intent signInIntent = mGoogleSingInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void createUserProfile(String userID, String displayName, String email){
+        com.example.rckbrswatch2app.User user = new User(userID, displayName, email);
+
+        //Zmienić nazwę funkcji
+        elementViewModel.registerUserOutside(user);
     }
 
     @Override
@@ -103,9 +117,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         Log.d("GoogleLogin", "GoogleLogin Successfully");
                         FirebaseUser user = mAuth.getCurrentUser();
+                        //Funkcja spajaąca
+                        assert user != null;
+                        createUserProfile(user.getUid(), user.getDisplayName(), user.getEmail());
+
                         Intent intent = new Intent(this, MainActivity.class);
                         startActivity(intent);
                         finish();

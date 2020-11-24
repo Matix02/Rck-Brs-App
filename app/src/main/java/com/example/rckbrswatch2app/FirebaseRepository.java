@@ -1,6 +1,5 @@
 package com.example.rckbrswatch2app;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -9,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,8 +36,6 @@ import java.util.stream.Collectors;
 
 import io.reactivex.disposables.CompositeDisposable;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class FirebaseRepository {
     private DatabaseReference mReferenceElement;
     private List<Element> elementList;
@@ -57,11 +55,12 @@ public class FirebaseRepository {
     // Filter Share Preferences
     SharedPreferences sharedPreferences;
 
+
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
     }
 
-    public MutableLiveData<List<Element>> readFirestoreElements(){
+    public MutableLiveData<List<Element>> readFirestoreElements(String userID){
         elementList = new ArrayList<>();
         //SharedPrefrence do zapisu i odczytu filtracji
 
@@ -138,27 +137,42 @@ public class FirebaseRepository {
         return elementLiveData;
     }
 
-    public void addDocument(){
-        //Dodawanie od Admina, przekazać na FAB'a
-        Element element = new Element("Ku jezioru", "Film", false, "Borys", "New");
-
-        Map<String, Object> elementData = new HashMap<>();
-        elementData.put("title", element.getTitle());
-        elementData.put("category", element.getCategory());
-        elementData.put("share", element.getShare());
-        elementData.put("isWatched", element.isWatched());
+    public void registerOutsideUser(User newUser){
+        String newUserID = newUser.getUserID();
 
         Map<String, Object> userData = new HashMap<>();
-        userData.put("email", "DSASd@wp.pl");
-        userData.put("name", "Tetrix02");
-        userData.put("password", "1234567");
+        userData.put("email", newUser.getEmail());
+        userData.put("name", newUser.getDisplayName());
+        userData.put("password", newUser.getPassword());
         userData.put("NewLogin", FieldValue.serverTimestamp());
         userData.put("LastLogin", FieldValue.serverTimestamp());
 
-        mFirestoreElement.collection("News").add(element);
+        DocumentReference reference = mFirestoreElement.collection("Users").document(newUserID);
+        CollectionReference elementsCollectionReference = mFirestoreElement.collection("Elements");
 
-       /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu */
-       CollectionReference reference = mFirestoreElement.collection("Users");
+        Task<Void> referenceTask = reference.set(userData);
+
+        referenceTask.addOnSuccessListener(documentReference -> {
+            elementsCollectionReference
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()){
+                            CollectionReference userCollectionReference = reference.collection("Lista");
+                            for(QueryDocumentSnapshot d: Objects.requireNonNull(task.getResult())){
+                                Element element = d.toObject(Element.class);
+                                userCollectionReference
+                                        .add(element)
+                                        .addOnFailureListener(f -> Log.d("RegisterOutsideUser", "Nie udało się zrobić pętli by dodać wszystko " + f.getMessage()));
+                            }
+                        } else {
+                            Log.d("RegisterOutsideUser", "Nie udało się zrobić pętli by dodać wszystko " + task.getException());
+                        }
+                    });
+        })
+                .addOnFailureListener(e -> Log.d("RegisterOutsideUser", "Nie udało się dodać Użytkownika " + e.getMessage()));
+       /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu
+       * Kopia z Bazą dla CollectionReference*/
+      /* CollectionReference reference = mFirestoreElement.collection("Users");
         Task<DocumentReference> referenceTask = reference.add(userData);
         referenceTask.addOnSuccessListener(documentReference -> {
             String d = documentReference.getId();
@@ -169,7 +183,7 @@ public class FirebaseRepository {
                 .addOnFailureListener(f -> Log.d("Firestore", "Nie udało się zrobić pętli by dodać wszystko"));
             }
         })
-        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));
+        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
     }
     public void addCompletelyNewElement(){
         Element element = new Element("Wściekłe Psy", "Film", false, "Borys");
@@ -331,11 +345,26 @@ public class FirebaseRepository {
                 });
     }
 
+    //Spradza użytkownika, nie możliwe do wykorzystania
+    public void isUserExist(String userID){
+        boolean isUserExists;
+        mFirestoreElement.collection("Users").document(userID)
+                .get()
+                .addOnSuccessListener(success -> {
+                    if (success.exists())
+                        Log.d("UserSearch", "True");
+                })
+                .addOnFailureListener(failure -> {
+                    Log.d("UserSearch", "False");
+                });
+    }
+
     public void transList() {
         final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
         final CollectionReference newsListRef = mFirestoreElement.collection("News");
         Log.d("DatabaseSize", "Size of this db in repository is " + elementList.size());
-        getRandomElement("Gra");
+        /* Lista Randomowa
+        getRandomElement("Gra");*/
         mFirestoreElement.runTransaction(transaction -> {
             //Date Section
             DocumentSnapshot snapshot = transaction.get(userLogRef);
@@ -453,7 +482,7 @@ public class FirebaseRepository {
                 });
     }
 
-    public void registerUser(String name, String email, String password){
+    public void registerInsideUser(String name, String email, String password){
         final DocumentReference reference = mFirestoreElement.collection("Users").document();
 
         /*Nie potrzeba (chyba) zabezpieczenia przed tworzeniem kont o tym samym loginie oraz Emailu
@@ -482,10 +511,10 @@ public class FirebaseRepository {
     }
     public /*MutableLiveData<Element>*/void getRandomElement(String choosenCategory){
         final CollectionReference reference = mFirestoreElement.collection("Users").document(userID).collection("Lista");
-        Log.d("DatabaseSize", "ElementList Complete is " + elementList.size());
+        Log.d("Random", "ElementList Complete is " + elementList.size());
 
         List<Element> battleList = elementList.stream().filter(p -> !p.isWatched).collect(Collectors.toList());
-        Log.d("DatabaseSize", "BattleList NoWatched is " + battleList.size());
+        Log.d("Random", "BattleList NoWatched is " + battleList.size());
         List<Element> filteredList = new ArrayList<>();
 
         if (battleList.size() >= 1){
@@ -509,10 +538,10 @@ public class FirebaseRepository {
             int randomIndex = ThreadLocalRandom.current().nextInt(0, filteredList.size());
             Log.d("Random", "Random number is " + randomIndex);
             Element element = filteredList.get(randomIndex);
-            Log.d("Firebase", "Random Element => " + element.getTitle());
+            Log.d("Random", "Random Element => " + element.getTitle());
         }
         else
-            Log.d("Firebase", "There's NO Random Element");
+            Log.d("Random", "There's NO Random Element");
 
         /*Dodać jeszcze Default, chyba (w zależności od sposobu zwracanych elementów) lub blok try/catch, gdy mimo posiadania
         elementów nieoglądniętych lub nieogranych to wyświetla się że brak danych na liście, bo uzytkownik nie posiada aktualnie
@@ -566,6 +595,7 @@ public class FirebaseRepository {
             completeList = new ArrayList<>(elements);
         }
         return completeList;
+
     }
 
     List<Element> promFilter(boolean promRock, boolean promBorys, boolean promRockBorys, boolean others, List<Element> elements) {
@@ -606,6 +636,10 @@ public class FirebaseRepository {
 
     public void createFirebaseElement(Element element) {
         mReferenceElement.push().setValue(element);
+    }
+
+    public void signOut() {
+        FirebaseAuth.getInstance().signOut();
     }
    /*
    !!! Dodawanie Dokumentów !!!

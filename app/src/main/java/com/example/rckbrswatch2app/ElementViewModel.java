@@ -39,24 +39,27 @@ public class ElementViewModel extends AndroidViewModel {
         elementRoomRepository.createElement(id, title, category, share, isWatched);
     }*/
     //*********************FirestoreOperations //////////////*******************
-
     public LiveData<List<Boolean>> readFavDocumentFirestore (){ return  firebaseRepository.readUserFavElementsDocument(); }
-    public LiveData<List<Element>> readFirestore (){ return firebaseRepository.readFirestoreElements(); }
+    public LiveData<List<Element>> readFirestore (String userID){ return firebaseRepository.readFirestoreElements(userID); }
     public LiveData<List<Element>> getNewsCollection(){ return firebaseRepository.getNews(); }
 
-    public void addDocument(){ firebaseRepository.addDocument(); }
+    public void registerUserOutside(User user){ firebaseRepository.registerOutsideUser(user); }
     public void getNews(){ firebaseRepository.getNews(); }
 
     public void getFilterDataNews() { firebaseRepository.filterNews(); }
     public void getLastnNewLogin() { firebaseRepository.getDate(); }
 
     public void setActiveUserLogin() { firebaseRepository.setTimeLogin(); }
+    public void singOut() { firebaseRepository.signOut(); }
+    public void checkUser(String userID) { firebaseRepository.isUserExist(userID);}
     //*********************FirestoreOperations //////////////*******************
+
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
     {
         Log.d("Bufor", "Filter !!!");
         return elementRoomRepository.filterList(elements, gamestate);
     }
+
 
     public LiveData<List<Element>> updateList(List<Element> elements){ return  elementRoomRepository.equalData(elements); }
 

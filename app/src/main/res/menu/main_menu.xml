@@ -29,4 +29,9 @@
         android:title="Delete All Room"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/signOut"
+        android:title="Sign Out"
+        app:showAsAction="never"
+        />
 </menu>
