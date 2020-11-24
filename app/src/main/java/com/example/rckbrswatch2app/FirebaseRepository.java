@@ -151,7 +151,13 @@ public class FirebaseRepository {
         CollectionReference elementsCollectionReference = mFirestoreElement.collection("Elements");
 
         Task<Void> referenceTask = reference.set(userData);
-
+        /*zastanowić się na problemem związanym z powtórnym odpalanie funkcji
+       , która jest tylko dla nowych użytkowników. Rozwiązanie, dodać tutaj funkcję przy dokumencie = .exists(),
+       lub z SharePrefrences. lub jakoś z searchem. Metody te sa opisane według kolejności według których powinno zostać
+       zasotosowane. I jeszcze naprawić dodwanie nowych elementów do nowej Listy użytkownika, bo dodawane są jako nowe elementy o tej samej zawartości.
+       Spróbować zmodyfikować kod tak, aby Id było to samo i w ogólnej Main Tabely Elements, jak i w tej dla każdego użytkownika.
+       Jeśli skończą się pomysły to zastosować, może zapisywanie podwójnie ID - jako nazwa dokumentu i samo pole Id w każdym z osobna. 
+         */
         referenceTask.addOnSuccessListener(documentReference -> {
             elementsCollectionReference
                     .get()

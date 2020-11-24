@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,9 +34,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private FirebaseAuth mAuth;
 
     private GoogleSignInClient mGoogleSingInClient;
-    ElementViewModel elementViewModel;
+    private ElementViewModel elementViewModel;
 
-    static String userID;
+    private String userID;
+
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +67,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             Intent intent = new Intent(this, MainActivity.class);
-            Log.d("GoogleLogin", "firebaseLogin:  " + currentUser.getUid());
             userID = currentUser.getUid();
-
             intent.putExtra("userID", userID);
-           // elementViewModel.checkUser("aasdoajsdkj askw3ieq3e");
+
             startActivity(intent);
             finish();
         }
@@ -125,6 +126,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         createUserProfile(user.getUid(), user.getDisplayName(), user.getEmail());
 
                         Intent intent = new Intent(this, MainActivity.class);
+                        userID = user.getUid();
+                        intent.putExtra("userID", userID);
+
                         startActivity(intent);
                         finish();
                     } else {
