@@ -120,7 +120,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
                     Log.d("Bufor", "ONCHECKBOX before is " + element.isWatched());
 
                     element.setWatched(!element.isWatched());
-                    mainActivity.elementViewModel.updateElement(element);
+                    //mainActivity.elementViewModel.updateElement(element);
                     Log.d("Bufor", "ONCHECKBOX after is " + element.isWatched());
             });
         }

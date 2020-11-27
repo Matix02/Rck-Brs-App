@@ -1,13 +1,8 @@
 package com.example.rckbrswatch2app;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
-@Entity(tableName = "Element")
 public class Element {
 
-    @PrimaryKey(autoGenerate = true)
-    private long id;
+    private String id;
     private String share;
     private String title;
     private String category;
@@ -27,7 +22,7 @@ public class Element {
         this.isWatched = isWatched;
         this.share = share;
     }
-    public Element(long id, String title, String category, boolean isWatched, String share) {
+    public Element(String id, String title, String category, boolean isWatched, String share) {
         this.id = id;
         this.title = title;
         this.category = category;
@@ -41,7 +36,7 @@ public class Element {
         this.share = share;
         this.state = state;
     }
-    public Element(long id, String title, String category, boolean isWatched, String share, String state) {
+    public Element(String id, String title, String category, boolean isWatched, String share, String state) {
         this.id = id;
         this.title = title;
         this.category = category;
@@ -64,9 +59,9 @@ public class Element {
     public <T> Element(T toObject) {
     }
 
-    public long getId() { return id; }
+    public String getId() { return id; }
 
-    public void setId(long id) { this.id = id; }
+    public void setId(String id) { this.id = id; }
 
     public String getTitle() {
         return title;
@@ -101,21 +96,6 @@ public class Element {
     public void setState(String state) {this.state = state; }
 
 }
-class Watched{
-    private boolean isWatched;
 
-    public Watched(boolean isWatched) {
-        this.isWatched = isWatched;
-    }
-
-    public boolean isWatched() {
-        return isWatched;
-    }
-
-    public void setWatched(boolean watched) {
-        isWatched = watched;
-    }
-
-}
 
 

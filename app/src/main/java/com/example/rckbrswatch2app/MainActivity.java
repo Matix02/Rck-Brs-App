@@ -39,10 +39,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     List<Boolean> isWatchedList;
     static int counterNews = 0;
     static int counterData = 0;
-    private String userID = "mENkJn3iyIQDIqSh3cRc";
+   // private String userID = "mENkJn3iyIQDIqSh3cRc";
 
     //NieKoniecznie taka metoda jest właściwa, bo jest jeszcze Intent.putExtra(UserID); Memoryleaks
-    static final String d = LoginActivity.userID;
+    static final String userID = LoginActivity.userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,19 +108,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                elementViewModel.deleteElement(adapter.getElementAt(viewHolder.getAdapterPosition()));
+                //elementViewModel.deleteElement(adapter.getElementAt(viewHolder.getAdapterPosition()));
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
     }
 
-    public void filterList(){
-        gameState = sharedPreferences.getBoolean("GameList", false);
+   public void filterList(){
+     /*  public void checkUser(String userID) { firebaseRepository.isUserExist(userID);}
+       gameState = sharedPreferences.getBoolean("GameList", false);
 
         elementViewModel.filterElement(elementFilterList, gameState).observe(this, elements -> {
             Log.d("Bufor", "_FILTER_ Size Elements " + elements.size() + " in onSharedPreferenceChanged/FilterElement/Observe");
             adapter.setElementList(elements);
-        });
+        }); */
     }
 
     @Override
@@ -161,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.filter:
-                elementViewModel.updateTrigger(5, "title");
+                //elementViewModel.updateTrigger(5, "title");
                 return true;
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -170,10 +171,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case R.id.addF:
                 //Element element = new Element("Hello", "Film", true, "Rock");
                // elementViewModel.createFirebaseElement(element);
-                //elementViewModel.addDocument();
+                elementViewModel.addElement(userID);
                 return true;
             case R.id.deleteRoom:
-                elementViewModel.deleteAllElements();
+              //  elementViewModel.deleteAllElements();
                 return true;
             case R.id.signOut:
                 //Element element = new Element("Hello", "Film", true, "Rock");

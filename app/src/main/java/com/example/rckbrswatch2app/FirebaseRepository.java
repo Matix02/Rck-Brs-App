@@ -151,12 +151,12 @@ public class FirebaseRepository {
         CollectionReference elementsCollectionReference = mFirestoreElement.collection("Elements");
 
         Task<Void> referenceTask = reference.set(userData);
-        /*zastanowić się na problemem związanym z powtórnym odpalanie funkcji
-       , która jest tylko dla nowych użytkowników. Rozwiązanie, dodać tutaj funkcję przy dokumencie = .exists(),
+        /*zastanowić się na problemem związanym z powtórnym odpalanie funkcji,
+         która jest tylko dla nowych użytkowników. Rozwiązanie, dodać tutaj funkcję przy dokumencie = .exists(),
        lub z SharePrefrences. lub jakoś z searchem. Metody te sa opisane według kolejności według których powinno zostać
        zasotosowane. I jeszcze naprawić dodwanie nowych elementów do nowej Listy użytkownika, bo dodawane są jako nowe elementy o tej samej zawartości.
        Spróbować zmodyfikować kod tak, aby Id było to samo i w ogólnej Main Tabely Elements, jak i w tej dla każdego użytkownika.
-       Jeśli skończą się pomysły to zastosować, może zapisywanie podwójnie ID - jako nazwa dokumentu i samo pole Id w każdym z osobna. 
+       Jeśli skończą się pomysły to zastosować, może zapisywanie podwójnie ID - jako nazwa dokumentu i samo pole Id w każdym z osobna.
          */
         referenceTask.addOnSuccessListener(documentReference -> {
             elementsCollectionReference
@@ -191,11 +191,53 @@ public class FirebaseRepository {
         })
         .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
     }
-    public void addCompletelyNewElement(){
-        Element element = new Element("Wściekłe Psy", "Film", false, "Borys");
+    public void addNewElement(String userID){
+        Element element = new Element("Cyberpunk2077", "Gra", false, "Rck&Brs");
         //Pobieranie UserId itd.
-        String userID = "hjGb7smtlF4kjzvaYFnl";
-        mFirestoreElement.collection("Users").document(userID).collection("Lista").add(element);
+
+        DocumentReference documentElementsRef = mFirestoreElement.collection("Elements").document();
+        String docNewID = documentElementsRef.getId();
+
+        element.setId(docNewID);
+        Map<String, Object> elementData = new HashMap<>();
+        elementData.put("id", element.getId());
+        elementData.put("title", element.getTitle());
+        elementData.put("category", element.getCategory());
+        elementData.put("share", element.getShare());
+        elementData.put("isWatched", element.isWatched());
+
+        DocumentReference newsDocument = mFirestoreElement.collection("News").document(docNewID);
+        Log.d("UserID", "UserID " + userID);
+        DocumentReference userDocument = mFirestoreElement.collection("Users").document(userID).collection("Lista").document(docNewID);
+
+        /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu
+         * Kopia z Bazą dla CollectionReference*/
+        mFirestoreElement.runTransaction(transaction -> {
+        //    transaction.set(documentElementsRef, elementData);
+            transaction.set(userDocument, elementData);
+           // transaction.set(newsDocument, elementData);
+
+            return null;
+        }).addOnSuccessListener(success -> {
+            Log.d("AddTransaction", "TransactionAdd Success");
+
+        }).addOnFailureListener(error -> {
+            Log.d("AddTransaction", "TransactionADD Failed");
+
+        });
+
+      /*  CollectionReference reference = mFirestoreElement.collection("Users");
+        Task<DocumentReference> referenceTask = reference.add(userData);
+        referenceTask.addOnSuccessListener(documentReference -> {
+            String d = documentReference.getId();
+
+            CollectionReference collectionReference = reference.document(d).collection("Lista");
+            for(Element e: elementList){
+                collectionReference.add(e)
+                .addOnFailureListener(f -> Log.d("Firestore", "Nie udało się zrobić pętli by dodać wszystko"));
+            }
+        })
+        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
     }
     public MutableLiveData<List<Element>> getNews() {
         Map<String, Object> booleanMap = new HashMap<>();
@@ -463,7 +505,6 @@ public class FirebaseRepository {
                 .addOnFailureListener(error -> {
                     Log.d("Firestore", "UserTransactionIsWatched failed because of " + error);
                 });
-
     }
 
     public void deleteElement(Element element, String elementId){
@@ -512,8 +553,6 @@ public class FirebaseRepository {
                 .addOnFailureListener(error -> {
                     Log.d("Firestore", "Registration failed because of " + error);
                 });
-
-
     }
     public /*MutableLiveData<Element>*/void getRandomElement(String choosenCategory){
         final CollectionReference reference = mFirestoreElement.collection("Users").document(userID).collection("Lista");

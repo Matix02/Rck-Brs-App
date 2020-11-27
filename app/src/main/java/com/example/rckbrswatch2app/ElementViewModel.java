@@ -22,8 +22,8 @@ public class ElementViewModel extends AndroidViewModel {
     //Koniec Mojego szajus
     public ElementViewModel(@NonNull Application application) {
         super(application);
-        elementRoomRepository = new ElementRoomRepository(application);
-        elementLiveData = elementRoomRepository.getElementLiveData();
+     //   elementRoomRepository = new ElementRoomRepository(application);
+       // elementLiveData = elementRoomRepository.getElementLiveData();
         //Start mojego szajsu
         firebaseRepository = new FirebaseRepository();
     }
@@ -52,6 +52,8 @@ public class ElementViewModel extends AndroidViewModel {
     public void setActiveUserLogin() { firebaseRepository.setTimeLogin(); }
     public void singOut() { firebaseRepository.signOut(); }
     public void checkUser(String userID) { firebaseRepository.isUserExist(userID);}
+
+    public void addElement(String userID) { firebaseRepository.addNewElement(userID); }
     //*********************FirestoreOperations //////////////*******************
 
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)

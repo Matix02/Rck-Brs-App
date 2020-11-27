@@ -36,9 +36,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInClient mGoogleSingInClient;
     private ElementViewModel elementViewModel;
 
-    private String userID;
+    //sprawdzić
+    protected static String userID;
 
     SharedPreferences sharedPreferences;
+
+    //Może pobawić się z Ponownym uwierzytelnienim użytkownika, bo wylogowuje i wlogowuje odrazu po tym, podpatrzeć w innyych aplikacjach, jeśli czas pozowli
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
