@@ -47,6 +47,7 @@ public class FirebaseRepository {
     private List<Element> newsList;
     private MutableLiveData<List<Element>> newsElementLiveData = new MutableLiveData<>();
     private String userID = "mENkJn3iyIQDIqSh3cRc";
+    private String currentUserID;
     //Date Category
     private Calendar lastLogin = Calendar.getInstance();
     private Calendar newLogin = Calendar.getInstance();
@@ -62,6 +63,7 @@ public class FirebaseRepository {
 
     public MutableLiveData<List<Element>> readFirestoreElements(String userID){
         elementList = new ArrayList<>();
+        currentUserID = userID;
         //SharedPrefrence do zapisu i odczytu filtracji
 
         mFirestoreElement.collection("Users").document(userID).collection("Lista")
@@ -193,7 +195,7 @@ public class FirebaseRepository {
     }
     public void addNewElement(String userID){
         Element element = new Element("Cyberpunk2077", "Gra", false, "Rck&Brs");
-        //Pobieranie UserId itd.
+        Date creationDate = new Date();
 
         DocumentReference documentElementsRef = mFirestoreElement.collection("Elements").document();
         String docNewID = documentElementsRef.getId();
@@ -206,23 +208,24 @@ public class FirebaseRepository {
         elementData.put("share", element.getShare());
         elementData.put("isWatched", element.isWatched());
 
-        DocumentReference newsDocument = mFirestoreElement.collection("News").document(docNewID);
-        Log.d("UserID", "UserID " + userID);
-        DocumentReference userDocument = mFirestoreElement.collection("Users").document(userID).collection("Lista").document(docNewID);
+        Map<String, Object> newsElementData = new HashMap<>(elementData);
+        newsElementData.put("state", "New");
+        newsElementData.put("time", creationDate);
 
-        /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu
-         * Kopia z Bazą dla CollectionReference*/
+        DocumentReference userDocument = mFirestoreElement.collection("Users").document(userID).collection("Lista").document(docNewID);
+        DocumentReference newsDocument = mFirestoreElement.collection("News").document(docNewID);
+
         mFirestoreElement.runTransaction(transaction -> {
-        //    transaction.set(documentElementsRef, elementData);
+            transaction.set(documentElementsRef, elementData);
             transaction.set(userDocument, elementData);
-           // transaction.set(newsDocument, elementData);
+            transaction.set(newsDocument, newsElementData);
 
             return null;
         }).addOnSuccessListener(success -> {
             Log.d("AddTransaction", "TransactionAdd Success");
 
         }).addOnFailureListener(error -> {
-            Log.d("AddTransaction", "TransactionADD Failed");
+            Log.d("AddTransaction", "TransactionADD Failed = " + error);
 
         });
 
@@ -491,19 +494,17 @@ public class FirebaseRepository {
     }
 
     //Niedokończone, trzeba mieć podłączony backend - repository z UI
-    public void setWatchElement(Element element, boolean isWatched){
-        final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID).collection("Lista")
-                .document(/*potrzebny jest ID tego elementu*/);
+    public void updateWatchElement(Element element){
+        DocumentReference listRef = mFirestoreElement.collection("Users").document(currentUserID).collection("Lista")
+                .document(element.getId());
+        boolean newIsWatchedElement = element.isWatched;
 
-        mFirestoreElement.runTransaction(transaction -> {
-            transaction.update(listRef, "watched", isWatched);
-            return null;
-        })
+        listRef.update("isWatched", newIsWatchedElement)
                 .addOnSuccessListener(command -> {
-                    Log.d("Firestore", "UserTransactionIsWatched success");
+                    Log.d("Firestore", "UpdateIsWatched success");
                 })
                 .addOnFailureListener(error -> {
-                    Log.d("Firestore", "UserTransactionIsWatched failed because of " + error);
+                    Log.d("Firestore", "UpdateIsWatched failed because of " + error);
                 });
     }
 

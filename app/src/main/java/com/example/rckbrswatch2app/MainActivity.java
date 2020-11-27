@@ -1,6 +1,5 @@
 package com.example.rckbrswatch2app;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,9 +17,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FieldValue;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     List<Boolean> isWatchedList;
     static int counterNews = 0;
     static int counterData = 0;
-   // private String userID = "mENkJn3iyIQDIqSh3cRc";
+   //private String userID = "mENkJn3iyIQDIqSh3cRc";
 
     //NieKoniecznie taka metoda jest właściwa, bo jest jeszcze Intent.putExtra(UserID); Memoryleaks
     static final String userID = LoginActivity.userID;
@@ -74,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // elementViewModel.updateList(firebaseFilterList);
             // filterList();
         }); */
-
 
         elementViewModel.readFirestore(userID).observe(this , elementsList -> {
             firebaseFilterList = new ArrayList<>();
@@ -137,8 +132,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         MenuItem menuItem = menu.findItem(R.id.searchView);
         SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setOnQueryTextListener(this);
-       // searchView.setIconifiedByDefault(false);
-       // searchView.setQuery("", false);
 
         return true;
     }
@@ -150,11 +143,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        String userInput = newText.toLowerCase();
-        List<Element> searchedList = new ArrayList<>();
-
         adapter.getFilter().filter(newText);
-
         return false;
     }
 

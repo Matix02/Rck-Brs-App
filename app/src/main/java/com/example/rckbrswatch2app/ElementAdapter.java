@@ -11,6 +11,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.w3c.dom.Text;
@@ -27,6 +28,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     private List<Element> elementList = new ArrayList<>();
     private List<Element> elementListAll;
     private OnItemClickListener listener;
+
 
     //Mój szajs
     MainActivity mainActivity;
@@ -75,8 +77,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<Element> fitleredList = new ArrayList<>();
-           // elementListAll.clear();
-           // elementListAll.addAll(elementList);
             if (constraint.toString().isEmpty())
                 fitleredList.addAll(elementListAll);
             else {
@@ -107,6 +107,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         private CheckBox checkBoxWatch;
         private TextView textViewShare;
 
+
         public ElementHolder(@NonNull View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.titleTV);
@@ -120,7 +121,8 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
                     Log.d("Bufor", "ONCHECKBOX before is " + element.isWatched());
 
                     element.setWatched(!element.isWatched());
-                    //mainActivity.elementViewModel.updateElement(element);
+                    mainActivity.elementViewModel.updateWatchedElement(element);
+
                     Log.d("Bufor", "ONCHECKBOX after is " + element.isWatched());
             });
         }

@@ -54,6 +54,7 @@ public class ElementViewModel extends AndroidViewModel {
     public void checkUser(String userID) { firebaseRepository.isUserExist(userID);}
 
     public void addElement(String userID) { firebaseRepository.addNewElement(userID); }
+    public void updateWatchedElement(Element element){ firebaseRepository.updateWatchElement(element);}
     //*********************FirestoreOperations //////////////*******************
 
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
