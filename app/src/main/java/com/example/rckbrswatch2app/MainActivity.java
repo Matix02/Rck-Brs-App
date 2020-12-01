@@ -56,20 +56,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
 
+
         Intent intent = getIntent();
         String userID = intent.getStringExtra("userID");
         Log.d("UserID", "is " + userID);
 
         long startTime = System.currentTimeMillis();
-
-       /* elementViewModel.getFirebaseElements().observe(this, elements -> {
-             firebaseFilterList = new ArrayList<>();
-             firebaseFilterList.addAll(elements);
-             Log.d("FirebaseDB", "FIREBASE elements size " + elements.size());
-             adapter.setElementList(firebaseFilterList);
-            // elementViewModel.updateList(firebaseFilterList);
-            // filterList();
-        }); */
 
         elementViewModel.readFirestore(userID).observe(this , elementsList -> {
             firebaseFilterList = new ArrayList<>();
@@ -86,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             });
         });
 
-        elementViewModel.getFilterDataNews();
+     //   elementViewModel.getFilterDataNews();
         elementViewModel.getLastnNewLogin();
         elementViewModel.setActiveUserLogin();
 
@@ -103,7 +95,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                //elementViewModel.deleteElement(adapter.getElementAt(viewHolder.getAdapterPosition()));
+                String selectedElementID = adapter.getElementAt(viewHolder.getAdapterPosition()).getId();
+                elementViewModel.deleteElement(userID, selectedElementID);
+               // adapter.notifyDataSetChanged();
+                Log.d("DeleteTransaction", "MainActivity Delete elementID arg -> " + selectedElementID);
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);

@@ -55,6 +55,7 @@ public class ElementViewModel extends AndroidViewModel {
 
     public void addElement(String userID) { firebaseRepository.addNewElement(userID); }
     public void updateWatchedElement(Element element){ firebaseRepository.updateWatchElement(element);}
+    public void deleteElement(String userID, String elementID) { firebaseRepository.deleteElement(userID, elementID);}
     //*********************FirestoreOperations //////////////*******************
 
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)
@@ -74,9 +75,9 @@ public class ElementViewModel extends AndroidViewModel {
         elementRoomRepository.updateElement(element);
     }
 
-    public void deleteElement(Element element) {
+  /*  public void deleteElement(Element element) {
         elementRoomRepository.deleteElement(element);
-    }
+    }*/
 
     public void deleteAllElements(){ elementRoomRepository.deleteAllElements();}
 

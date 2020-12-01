@@ -62,32 +62,34 @@ public class FirebaseRepository {
     }
 
     public MutableLiveData<List<Element>> readFirestoreElements(String userID){
-        elementList = new ArrayList<>();
         currentUserID = userID;
         //SharedPrefrence do zapisu i odczytu filtracji
 
         mFirestoreElement.collection("Users").document(userID).collection("Lista")
-              //  .whereEqualTo("category", "Gra")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
-                        for(QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult()))
-                        {
-                            Log.d("Firestore2", "FirestoreTest data => " + documentSnapshot.getData());
-                            Element element = documentSnapshot.toObject(Element.class);
-                            elementList.add(element);
-                        }
-                        Log.d("Firestore2", "FirestoreTest data/size => " + elementList.size());
 
-                        List<Element> sharedList = new ArrayList<>(elementList);
-                        Log.d("Firestore2", "ShareList BEFORE data/size => " + sharedList.size());
-                        sharedList = complementationList(sharedList, true, false, true, true,true,true,true,true,true,true);
-                        Log.d("Firestore2", "ShareList AFTER data/size => " + sharedList.size());
-                       // registerUser("Johnny", "silverhand@nightcity.pl", "Samurai");
-                        elementLiveData.postValue(elementList);
-                    } else {
-                        Log.d("Firesotre2", "! FirestoreTest error = " + task.getException());
+              //  .whereEqualTo("category", "Gra")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.d("ReadFirebase", "ObserveElement has lost a mind" + error);
+                        return;
                     }
+                    //Możliwe, że zapis zawartości z ArrayListy Będzie resetowany zostawiając tutaj, sprawdzic
+                    elementList = new ArrayList<>();
+                    for (QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(value)) {
+                        Log.d("Firestore2", "FirestoreTest data => " + documentSnapshot.getData());
+                        Element element = documentSnapshot.toObject(Element.class);
+                        elementList.add(element);
+                    }
+                    Log.d("Firestore2", "FirestoreTest data/size => " + elementList.size());
+
+                    List<Element> sharedList = new ArrayList<>(elementList);
+                    Log.d("Firestore2", "ShareList BEFORE data/size => " + sharedList.size());
+                    sharedList = complementationList(sharedList, true, false, true, true, true, true, true, true, true, true);
+                    Log.d("Firestore2", "ShareList AFTER data/size => " + sharedList.size());
+                    // registerUser("Johnny", "silverhand@nightcity.pl", "Samurai");
+                    /* Odwracanie, uaktywnwnićjeśli wydajność będzie na dobrym poziomie - sfera dodatkowa
+                    Collections.reverse(elementList); */
+                    elementLiveData.postValue(elementList);
                 });
         return elementLiveData;
     }
@@ -498,6 +500,7 @@ public class FirebaseRepository {
         DocumentReference listRef = mFirestoreElement.collection("Users").document(currentUserID).collection("Lista")
                 .document(element.getId());
         boolean newIsWatchedElement = element.isWatched;
+       // Log.d("InMainFunctionSize", "FirestoreTest data/size => " + elementList.size());
 
         listRef.update("isWatched", newIsWatchedElement)
                 .addOnSuccessListener(command -> {
@@ -508,18 +511,22 @@ public class FirebaseRepository {
                 });
     }
 
-    public void deleteElement(Element element, String elementId){
+    public void deleteElement(String userID, String elementId){
         //Usuwa z listy tego właśnie administratora
         final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID).collection("Lista")
-                .document(/*brakuje ID ktory to dokument*/);
+                .document(elementId);
 
         //Dodaje do tabeli News dla pozostałych User'ów o statusie User, żeby przy następnym otwarciu został ten element usunięty
-        final DocumentReference newsRef = mFirestoreElement.collection("News").document(/*musi być konkretny ID tego elementu*/);
+        final DocumentReference newsRef = mFirestoreElement.collection("News").document(elementId);
+        Log.d("DeleteTransaction", "Delete elementID arg -> " + elementId);
 
         mFirestoreElement.runTransaction(transaction -> {
-           transaction.delete(listRef);
-           transaction.set(newsRef, element);
-
+            DocumentSnapshot snapshot = transaction.get(listRef);
+            Element element = snapshot.toObject(Element.class);
+            assert element != null;
+            Log.d("DeleteTransaction", "Delete title -> " + element.getTitle());
+            transaction.delete(listRef);
+            transaction.set(newsRef, element);
             return null;
         })
                 .addOnSuccessListener(command -> {

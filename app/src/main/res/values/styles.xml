@@ -2,9 +2,51 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimaryFirst</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkFirst</item>
+        <item name="colorAccent">@color/colorAccentFirst</item>
+    </style>
+
+    <style name="AppTheme.PopMe">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+
+    </style>
+
+    <style name="MainDesignControls">
+        <item name="android:textColor">@color/whiteText</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="MainTextPopUp" parent="MainDesignControls">
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="SecondTextPopUp" parent="MainDesignControls">
+        <item name="android:layout_margin">1sp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <style name="InsideText" parent="MainDesignControls">
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginTop">15sp</item>
+    </style>
+
+    <style name="ResultDesign" parent="MainTextPopUp">
+        <item name="android:textColor">@color/pureDark</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">7sp</item>
+    </style>
+
+    <style name="SwitchControls" parent="MainDesignControls">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_width">120sp</item>
+        <item name="android:minWidth">80sp</item>
+    </style>
+
+    <style name="ButtonFinalDesign">
+        <item name="android:layout_marginTop">8sp</item>
     </style>
 
 </resources>

@@ -100,6 +100,8 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         }
     };
 
+
+
     class ElementHolder extends RecyclerView.ViewHolder {
 
         private TextView textViewTitle;

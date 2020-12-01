@@ -10,4 +10,37 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="noElementsPlaceholder">\u0022Państwo na Spotify nie widzą.\u0022 \nNie znaleziono elementów! Spróbuj zmienić filtrację.</string>
+
+    <string name="checkbox">CheckBox</string>
+    <string name="enter_title">Enter title</string>
+    <string name="save">Save</string>
+    <string name="film">Film</string>
+    <string name="gra">Gra</string>
+    <string name="ksi_ka">Książka</string>
+    <string name="serial">Serial</string>
+    <string name="back">back</string>
+    <string name="delete">delete</string>
+    <string name="update">update</string>
+    <string name="rck_brs">Rck&amp;Brs&#160; </string>
+    <string name="rck"> &#160;Rck&#160; </string>
+    <string name="brs"> &#160;Brs&#160; </string>
+    <string name="rock">Rock</string>
+    <string name="borys">Borys</string>
+    <string name="inne">Inne</string>
+    <string name="kategorie">Kategorie:</string>
+    <string name="SecondPopUpRandomText">Nie możesz się zdecydować? \nWybierz kategorię i naciśnij losuj!</string>
+    <string name="MainPopUpRandomText">Random Shot</string>
+    <string name="wszystko">Wszystko</string>
+    <string name="ksiazki">Książki</string>
+    <string name="gry">Gry</string>
+    <string name="zaznacz_wszystko">Zaznacz Wszystko</string>
+    <string name="domy_lne">Default</string>
+    <string name="polecane">Polecane:</string>
+    <string name="filmy">Filmy</string>
+    <string name="seriale">Seriale</string>
+    <string name="nieuko_czonone">Nieukończonone</string>
+    <string name="uko_czone">Ukończone</string>
+    <string name="spersonalizuj_list">Spersonalizuj Listę</string>
+    <string name="poni_sze_opcje_pozwol_ci_dopasowa_list_do_w_asnych_potrzeb">Poniższe opcje pozwolą Ci dopasować listę do własnych potrzeb</string>
+    <string name="random_title">Random Title</string>
 </resources>
