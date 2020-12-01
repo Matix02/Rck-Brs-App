@@ -144,12 +144,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.filter:
+                intent = new Intent(getApplicationContext(), FilterPopActivity.class);
+                startActivity(intent);
                 //elementViewModel.updateTrigger(5, "title");
                 return true;
             case R.id.settings:
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.addF:

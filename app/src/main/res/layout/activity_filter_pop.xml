@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:text="@string/spersonalizuj_list" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <Switch
             android:id="@+id/finishSW"
             style="@style/SwitchControls"
             android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             android:layout_width="160sp"
             android:text="@string/uko_czone"
              />
-        <androidx.appcompat.widget.SwitchCompat
+        <Switch
             android:id="@+id/unfinishSW"
             android:layout_height="wrap_content"
             android:layout_width="160sp"
@@ -42,6 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="@string/kategorie" />
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -133,7 +134,7 @@
         android:layout_weight="1"
         android:paddingEnd="5dp">
 
-        <androidx.appcompat.widget.SwitchCompat
+        <Switch
             android:id="@+id/rockSW"
             android:minWidth="80sp"
 
@@ -141,7 +142,7 @@
             android:layout_height="wrap_content"
             android:text="@string/rock" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <Switch
             android:id="@+id/borysSW"
             style="@style/SwitchControls"
             android:minWidth="80sp"
@@ -149,7 +150,7 @@
             android:layout_height="wrap_content"
             android:text="@string/borys" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <Switch
             android:id="@+id/rockBorysSW"
             android:minWidth="80sp"
 
@@ -166,7 +167,7 @@
             android:paddingStart="5dp"
             android:paddingEnd="5dp">
 
-            <androidx.appcompat.widget.SwitchCompat
+            <Switch
                 android:id="@+id/otherSW"
                 style="@style/SwitchControls"
                 android:minWidth="80sp"
@@ -176,7 +177,7 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <androidx.appcompat.widget.SwitchCompat
+        <Switch
             android:id="@+id/allSW"
             style="@style/SwitchControls"
             android:layout_height="wrap_content"
