@@ -694,6 +694,26 @@ public class FirebaseRepository {
     public void signOut() {
         FirebaseAuth.getInstance().signOut();
     }
+    //*************Filter Section****************
+    public void setUserFilters(Filter filters)
+    {
+        Log.d("FilterSet", "I'm In");
+
+       final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
+               .collection("Preferencje")
+                .document("Filters");
+        listRef
+                .set(filters)
+                .addOnSuccessListener(success -> {
+                    Log.d("FilterSet", "FilterSet success");
+
+                })
+                .addOnFailureListener(error -> {
+                    Log.d("FilterSet", "FilterSet failed " + error);
+                });
+    }
+    //*************END of Filter Section*********
+
    /*
    !!! Dodawanie Dokumentów !!!
     public void addDocument(){

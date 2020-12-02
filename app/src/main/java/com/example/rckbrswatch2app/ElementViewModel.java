@@ -56,6 +56,8 @@ public class ElementViewModel extends AndroidViewModel {
     public void addElement(String userID) { firebaseRepository.addNewElement(userID); }
     public void updateWatchedElement(Element element){ firebaseRepository.updateWatchElement(element);}
     public void deleteElement(String userID, String elementID) { firebaseRepository.deleteElement(userID, elementID);}
+
+    public void setFilters(Filter filters) { firebaseRepository.setUserFilters(filters); }
     //*********************FirestoreOperations //////////////*******************
 
     public LiveData<List<Element>> filterElement(List<Element> elements, boolean gamestate)

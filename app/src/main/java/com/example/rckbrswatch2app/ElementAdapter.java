@@ -29,7 +29,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     private List<Element> elementListAll;
     private OnItemClickListener listener;
 
-
     //Mój szajs
     MainActivity mainActivity;
 
@@ -99,8 +98,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
            notifyDataSetChanged();
         }
     };
-
-
 
     class ElementHolder extends RecyclerView.ViewHolder {
 

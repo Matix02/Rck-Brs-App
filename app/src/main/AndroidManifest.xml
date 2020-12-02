@@ -10,6 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".FilterPopActivity"></activity>
+        <activity android:name=".FiltersDialogActivity"
+            android:parentActivityName=".MainActivity"
+            >
+        </activity>
+
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +23,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTop"></activity>
     </application>
 
 </manifest>

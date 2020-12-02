@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="12sp"
+    >
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/rodzajElementowTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="Rodzaj elementów"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/ukonczoneSW"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Ukończone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rodzajElementowTV"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/nieUkonczoneSW"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Nieukończone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ukonczoneSW"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/kategorieElementowTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rodzaj elementów"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nieUkonczoneSW"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/zaznaczWszystkeKategorieBT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:background="@android:color/transparent"
+        android:text="Zaz. Wszystko"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/kategorieElementowTV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nieUkonczoneSW"
+        />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/filmyCHB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Filmy"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/kategorieElementowTV"
+        />
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/serialeCHB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Seriale"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filmyCHB"
+        />
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/gryCHB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Gry"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/serialeCHB"
+        />
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/ksiazkiCHB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Książki"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gryCHB"
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/polecaneTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Polecane"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ksiazkiCHB"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/zaznaczWszystkoPolecaneBT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:background="@android:color/transparent"
+        android:text="Zaz. Wszystko"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/polecaneTV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ksiazkiCHB"
+        />
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/RckSWx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Rock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/polecaneTV"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/BrsSWx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Borys"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/RckSWx"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/RckBrsSWx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="RcknBrs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/BrsSWx"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/InneSWx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25sp"
+        android:text="Inne"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/RckBrsSWx"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/saveBTx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zatwierdź"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/InneSWx"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

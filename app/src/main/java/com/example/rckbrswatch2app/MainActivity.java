@@ -12,6 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         adapter = new ElementAdapter(MainActivity.this);
         recyclerView.setAdapter(adapter);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
+        elementViewModel = new ViewModelProvider(this).get(ElementViewModel.class);
 
 
         Intent intent = getIntent();
@@ -162,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             case R.id.deleteRoom:
               //  elementViewModel.deleteAllElements();
+                intent = new Intent(MainActivity.this, FiltersDialogActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.signOut:
                 //Element element = new Element("Hello", "Film", true, "Rock");
@@ -194,4 +200,5 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onPause();
         getPreferences(MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this);
     }
+
 }
