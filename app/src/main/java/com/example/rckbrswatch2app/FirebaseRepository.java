@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -55,7 +56,8 @@ public class FirebaseRepository {
     private MutableLiveData<Element> randomElement = new MutableLiveData<>();
     // Filter Share Preferences
     SharedPreferences sharedPreferences;
-
+    //Filters GetData
+    private MutableLiveData<Filter> filtersLiveData = new MutableLiveData<>();
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -695,6 +697,26 @@ public class FirebaseRepository {
         FirebaseAuth.getInstance().signOut();
     }
     //*************Filter Section****************
+    public MutableLiveData<Filter> getUserFilter(){
+        final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
+                .collection("Preferencje")
+                .document("Filters");
+
+        listRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                assert documentSnapshot != null;
+                if (documentSnapshot.exists()) {
+                    Filter filter = documentSnapshot.toObject(Filter.class);
+                    filtersLiveData.postValue(filter);
+                } else
+                    Log.d("FilterSection", "Something wrong with document after Successfull " + task.getException());
+            } else
+                Log.d("FilterSeciont", " Something wrong with Main document task " + task.getException());
+        });
+        return filtersLiveData;
+    }
+
     public void setUserFilters(Filter filters)
     {
         Log.d("FilterSet", "I'm In");

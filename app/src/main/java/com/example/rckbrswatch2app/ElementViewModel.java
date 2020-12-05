@@ -66,6 +66,7 @@ public class ElementViewModel extends AndroidViewModel {
         return elementRoomRepository.filterList(elements, gamestate);
     }
 
+    public LiveData<Filter> getUserFilters(){ return firebaseRepository.getUserFilter(); }
 
     public LiveData<List<Element>> updateList(List<Element> elements){ return  elementRoomRepository.equalData(elements); }
 
