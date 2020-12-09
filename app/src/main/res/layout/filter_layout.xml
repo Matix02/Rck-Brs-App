@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     android:padding="12sp"
     >
-
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/rodzajElementowTV"
         android:layout_width="match_parent"

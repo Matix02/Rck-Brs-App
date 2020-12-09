@@ -1,7 +1,6 @@
 package com.example.rckbrswatch2app;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -63,18 +62,30 @@ public class FiltersDialogActivity extends AppCompatActivity{
         setTitle("Filters");
 
         viewModel.getUserFilters().observe(this, filter1 -> {
-            Log.d("FilterTestOmg", "" + filter1.isFinished);
+            Filter filter = filter1;
+            finishSwitch.setChecked(filter.isFinished());
+            unFinishSwitch.setChecked(filter.isUnfinished());
+            filmsChBox.setChecked(filter.isFilm());
+            seriesChBox.setChecked(filter.isSeries());
+            booksChBox.setChecked(filter.isBook());
+            gamesChBox.setChecked(filter.isGame());
+            rckSwitch.setChecked(filter.isShareRck());
+            brsSwitch.setChecked(filter.isShareBrs());
+            rcknBrsSwitch.setChecked(filter.isShareRckBrs());
+            othersSwitch.setChecked(filter.isShareOther());
         });
 
         shareSelAllButton.setOnClickListener(click -> {
-
-            if(rckSwitch.isChecked() && brsSwitch.isChecked() && rcknBrsSwitch.isChecked() && othersSwitch.isChecked()) {
-
+           /* if(rckSwitch.isChecked() && brsSwitch.isChecked() && rcknBrsSwitch.isChecked() && othersSwitch.isChecked()) {
                 shareSelAllButton.setText(selectedAllShareText);
-
             } else {
                 resetSharesControls();
-            }
+            }*/
+           resetSharesControls();
+        });
+
+        categorySelAllButton.setOnClickListener(click -> {
+            resetCategoryControls();
         });
 
 
@@ -93,26 +104,22 @@ public class FiltersDialogActivity extends AppCompatActivity{
 
             viewModel.setFilters(currentFilters);
         });
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.filter_note_menu, menu);
+        menuInflater.inflate(R.menu.filter_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.reset_filter:
-                //saveFilterResult();
-                resetlAllFilter();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.reset_filter) {//saveFilterResult();
+            resetlAllFilter();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
     public void resetlAllFilter(){
         finishSwitch.setChecked(true);
@@ -126,7 +133,7 @@ public class FiltersDialogActivity extends AppCompatActivity{
         brsSwitch.setChecked(true);
         rcknBrsSwitch.setChecked(true);
         othersSwitch.setChecked(true);
-        shareSelAllButton.setText(unSelectedAllShareText);
+     //   shareSelAllButton.setText(unSelectedAllShareText);
     }
 
     public void resetCategoryControls(){
@@ -134,6 +141,6 @@ public class FiltersDialogActivity extends AppCompatActivity{
         seriesChBox.setChecked(true);
         booksChBox.setChecked(true);
         gamesChBox.setChecked(true);
-        categorySelAllButton.setText(unSelectedAllShareText);
+     //   categorySelAllButton.setText(unSelectedAllShareText);
     }
 }

@@ -10,21 +10,23 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, SearchView.OnQueryTextListener{
+
+    public static final int ADD_ELEMENT_REQUEST = 1;
+    public static final int EDIT_ELEMENT_REQUEST = 2;
 
     ElementViewModel elementViewModel;
     SharedPreferences sharedPreferences;
@@ -51,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         sharedPreferences = getSharedPreferences("SP_Test", MODE_PRIVATE);
 
+        FloatingActionButton floatingActionAddButton = findViewById(R.id.addFab);
+
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
@@ -59,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         recyclerView.setAdapter(adapter);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         elementViewModel = new ViewModelProvider(this).get(ElementViewModel.class);
-
 
         Intent intent = getIntent();
         String userID = intent.getStringExtra("userID");
@@ -106,6 +109,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
+
+        floatingActionAddButton.setOnClickListener(v -> {
+            Intent intentToAdd = new Intent(MainActivity.this, EditElementActivity.class);
+            startActivityForResult(intentToAdd, ADD_ELEMENT_REQUEST);
+
+        });
+
+        adapter.setOnItemClickListener(element -> {
+            Intent elementIntent = new Intent(MainActivity.this, EditElementActivity.class);
+            elementIntent.putExtra(EditElementActivity.EXTRA_RESULT_NUMBER, element.getId());
+            elementIntent.putExtra(EditElementActivity.EXTRA_ID, element.getId());
+            elementIntent.putExtra(EditElementActivity.EXTRA_TITLE, element.getTitle());
+            elementIntent.putExtra(EditElementActivity.EXTRA_CATEGORY, element.getCategory());
+            elementIntent.putExtra(EditElementActivity.EXTRA_SHARE, element.getShare());
+            elementIntent.putExtra(EditElementActivity.EXTRA_IS_WATCHED, element.isWatched());
+
+            startActivityForResult(elementIntent, EDIT_ELEMENT_REQUEST);
+        });
     }
 
    public void filterList(){
@@ -151,18 +172,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Intent intent;
         switch (item.getItemId()) {
             case R.id.filter:
-                intent = new Intent(getApplicationContext(), FilterPopActivity.class);
+                intent = new Intent(getApplicationContext(), FilterPopUpActivity.class);
                 startActivity(intent);
                 //elementViewModel.updateTrigger(5, "title");
                 return true;
             case R.id.settings:
-                intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
+               /* intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);*/
+               intent = new Intent(MainActivity.this, RandomDialogActivity.class);
+               startActivity(intent);
                 return true;
             case R.id.addF:
                 //Element element = new Element("Hello", "Film", true, "Rock");
                // elementViewModel.createFirebaseElement(element);
-                elementViewModel.addElement(userID);
+                //elementViewModel.addElement(userID);
                 return true;
             case R.id.deleteRoom:
               //  elementViewModel.deleteAllElements();
@@ -187,6 +210,40 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         filterList();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ADD_ELEMENT_REQUEST && resultCode == RESULT_OK) {
+            assert data != null;
+            String title = data.getStringExtra(EditElementActivity.EXTRA_TITLE);
+            String category = data.getStringExtra(EditElementActivity.EXTRA_CATEGORY);
+            String share = data.getStringExtra(EditElementActivity.EXTRA_SHARE);
+
+            Element element = new Element(title, category, share);
+            elementViewModel.addElement(element);
+            Toast.makeText(this, "Dodano Element", Toast.LENGTH_LONG).show();
+        } else if (requestCode == EDIT_ELEMENT_REQUEST && resultCode == RESULT_OK) {
+            assert data != null;
+            String resultNumber = data.getStringExtra(EditElementActivity.EXTRA_ID);
+
+            if (resultNumber == null) {
+                Toast.makeText(this, "Elementu nie mozna zauktualizować", Toast.LENGTH_LONG).show();
+                return;
+            }
+            String id = data.getStringExtra(EditElementActivity.EXTRA_ID);
+            String title = data.getStringExtra(EditElementActivity.EXTRA_TITLE);
+            String category = data.getStringExtra(EditElementActivity.EXTRA_CATEGORY);
+            String share = data.getStringExtra(EditElementActivity.EXTRA_SHARE);
+            boolean isWatched = data.getBooleanExtra(EditElementActivity.EXTRA_IS_WATCHED, false);
+
+            Element element = new Element(id, title, category, share);
+            elementViewModel.editElement(element);
+        } else {
+            Toast.makeText(this, "Nie udało się dodać Elementu", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

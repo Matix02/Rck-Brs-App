@@ -1,6 +1,6 @@
 package com.example.rckbrswatch2app;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,32 +10,41 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.SplittableRandom;
 
 public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementHolder> implements Filterable {
 
     private List<Element> elementList = new ArrayList<>();
     private List<Element> elementListAll;
     private OnItemClickListener listener;
-
     //Mój szajs
     MainActivity mainActivity;
 
     public ElementAdapter(MainActivity mainActivity){
         this.mainActivity = mainActivity;
     }
+    public ElementAdapter(){
+        super();
+    }
+    public static final DiffUtil.ItemCallback<Element> DIFF_CALLBACK = new DiffUtil.ItemCallback<Element>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Element oldItem, @NonNull Element newItem) {
+            return oldItem.getId().equals(newItem.getId());
+        }
 
+        @SuppressLint("DiffUtilEquals")
+        @Override
+        public boolean areContentsTheSame(@NonNull Element oldItem, @NonNull Element newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
     @NonNull
     @Override
     public ElementHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -66,6 +75,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     public Element getElementAt(int position){
         return elementList.get(position);
     }
+
 
     @Override
     public Filter getFilter() {
@@ -118,11 +128,16 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
                 int position = getAdapterPosition();
                     Element element = elementList.get(position);
                     Log.d("Bufor", "ONCHECKBOX before is " + element.isWatched());
-
                     element.setWatched(!element.isWatched());
                     mainActivity.elementViewModel.updateWatchedElement(element);
-
                     Log.d("Bufor", "ONCHECKBOX after is " + element.isWatched());
+            });
+
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (listener != null && position != RecyclerView.NO_POSITION) {
+                    listener.onItemClick(elementList.get(position));
+                }
             });
         }
     }

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,9 @@ public class FirebaseRepository {
     SharedPreferences sharedPreferences;
     //Filters GetData
     private MutableLiveData<Filter> filtersLiveData = new MutableLiveData<>();
+    //Random - sprawdzic czy mozna uzyc tej samej liveData?
+    private MutableLiveData<Element> randomElementLiveData = new MutableLiveData<>();
+    private List<Element> randomElementsList;
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -197,8 +201,8 @@ public class FirebaseRepository {
         })
         .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
     }
-    public void addNewElement(String userID){
-        Element element = new Element("Cyberpunk2077", "Gra", false, "Rck&Brs");
+    public void addNewElement(Element element){
+        //Element element = new Element("Cyberpunk2077", "Gra", false, "Rck&Brs");
         Date creationDate = new Date();
 
         DocumentReference documentElementsRef = mFirestoreElement.collection("Elements").document();
@@ -216,7 +220,8 @@ public class FirebaseRepository {
         newsElementData.put("state", "New");
         newsElementData.put("time", creationDate);
 
-        DocumentReference userDocument = mFirestoreElement.collection("Users").document(userID).collection("Lista").document(docNewID);
+        DocumentReference userDocument = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
+                .collection("Lista").document(docNewID);
         DocumentReference newsDocument = mFirestoreElement.collection("News").document(docNewID);
 
         mFirestoreElement.runTransaction(transaction -> {
@@ -515,12 +520,15 @@ public class FirebaseRepository {
 
     public void deleteElement(String userID, String elementId){
         //Usuwa z listy tego właśnie administratora
-        final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID).collection("Lista")
+        final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID)
+                .collection("Lista")
                 .document(elementId);
+
+        //Usuwa z listy Głównej - Main Elements
+        final DocumentReference mainElementsListRef = mFirestoreElement.collection("Elements").document(elementId);
 
         //Dodaje do tabeli News dla pozostałych User'ów o statusie User, żeby przy następnym otwarciu został ten element usunięty
         final DocumentReference newsRef = mFirestoreElement.collection("News").document(elementId);
-        Log.d("DeleteTransaction", "Delete elementID arg -> " + elementId);
 
         mFirestoreElement.runTransaction(transaction -> {
             DocumentSnapshot snapshot = transaction.get(listRef);
@@ -528,6 +536,40 @@ public class FirebaseRepository {
             assert element != null;
             Log.d("DeleteTransaction", "Delete title -> " + element.getTitle());
             transaction.delete(listRef);
+            transaction.delete(mainElementsListRef);
+            element.setState("Delete");
+            transaction.set(newsRef, element);
+            return null;
+        })
+                .addOnSuccessListener(command -> {
+                    Log.d("Firestore", "AdminTransactionDelete success");
+                })
+                .addOnFailureListener(error -> {
+                    Log.d("Firestore", "AdminTransactionDelete failed because of " + error);
+                });
+    }
+
+    public void editElement(Element element){
+        //Edytuje dany element z listy tego właśnie administratora
+        final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
+                .collection("Lista")
+                .document(element.getId());
+
+        //Edytuje główną tabelę początkową Main Elements
+        final DocumentReference maineElementsListRef = mFirestoreElement.collection("Elements")
+                .document(element.getId());
+
+        //Dodaje do tabeli News dla pozostałych User'ów o statusie User, żeby przy następnym otwarciu został ten element edytowany
+        final DocumentReference newsRef = mFirestoreElement.collection("News").document(element.getId());
+
+        mFirestoreElement.runTransaction(transaction -> {
+           // DocumentSnapshot snapshot = transaction.get(listRef);
+           // Element element = snapshot.toObject(Element.class);
+          //  assert element != null;
+            Log.d("DeleteTransaction", "Delete title -> " + element.getTitle());
+            transaction.set(listRef, element);
+            transaction.set(newsRef, element);
+            element.setState("Update");
             transaction.set(newsRef, element);
             return null;
         })
@@ -564,51 +606,47 @@ public class FirebaseRepository {
                     Log.d("Firestore", "Registration failed because of " + error);
                 });
     }
-    public /*MutableLiveData<Element>*/void getRandomElement(String choosenCategory){
-        final CollectionReference reference = mFirestoreElement.collection("Users").document(userID).collection("Lista");
-        Log.d("Random", "ElementList Complete is " + elementList.size());
 
-        List<Element> battleList = elementList.stream().filter(p -> !p.isWatched).collect(Collectors.toList());
-        Log.d("Random", "BattleList NoWatched is " + battleList.size());
-        List<Element> filteredList = new ArrayList<>();
+    public MutableLiveData<Element> getRandomElement(String selectedCategory, String selectedShare) {
+        final CollectionReference reference = mFirestoreElement.collection("Users")
+                .document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
+                .collection("Lista");
+        randomElementsList = new ArrayList<>();
+        //New
+        com.google.firebase.firestore.Query noWatchedElementsQuery = reference
+                .whereEqualTo("isWatched", false)
+                .whereEqualTo("category", selectedCategory)
+                .whereEqualTo("share", selectedShare);
 
-        if (battleList.size() >= 1){
-        switch (choosenCategory){
-            case "Wszystko":
-                break;
-            case "Gra":
-                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Gra")).collect(Collectors.toList());
-                break;
-            case "Serial":
-                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Serial")).collect(Collectors.toList());
-                break;
-            case "Film":
-                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Film")).collect(Collectors.toList());
-                break;
-            case "Książka":
-                filteredList = battleList.stream().filter(c -> c.getCategory().equals("Książka")).collect(Collectors.toList());
-                break;
-        }
-            Log.d("Random", "Random and FilteredList (before Rnaomd) is " + filteredList.size());
-            int randomIndex = ThreadLocalRandom.current().nextInt(0, filteredList.size());
-            Log.d("Random", "Random number is " + randomIndex);
-            Element element = filteredList.get(randomIndex);
-            Log.d("Random", "Random Element => " + element.getTitle());
-        }
-        else
-            Log.d("Random", "There's NO Random Element");
+        noWatchedElementsQuery.get()
+                .addOnCompleteListener(task -> {
+                    try {
+                        Random r = new Random();
+                        int rNumber;
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot doc : Objects.requireNonNull(task.getResult())) {
+                                Log.d("RandomRoll", " " + doc.getData());
+                                Element element = doc.toObject(Element.class);
+                                randomElementsList.add(element);
+                                Log.d("RandomRoll", " Size = " + task.getResult().size());
+                            }
+                            rNumber = r.nextInt(randomElementsList.size());
+                            Element element = randomElementsList.get(rNumber);
+                            Log.d("RandomRoll", "Element is " + element.getTitle());
 
-        /*Dodać jeszcze Default, chyba (w zależności od sposobu zwracanych elementów) lub blok try/catch, gdy mimo posiadania
-        elementów nieoglądniętych lub nieogranych to wyświetla się że brak danych na liście, bo uzytkownik nie posiada aktualnie
-        żadnych elementów z kategorii aktualnie wybranej.
-         */
-        //reference.document().getId();
+                            randomElementLiveData.postValue(element);
+                        } else
+                            Log.d("RandomRoll", " Rolling data roll really bad");
 
-
-
-
-        /*return randomElement;*/
+                } catch (Exception e){
+                        Element element = new Element();
+                        element.setTitle("No Elements");
+                        randomElementLiveData.postValue(element);
+                    }
+                });
+        return randomElementLiveData;
     }
+
     /* !!! Filtracja !!! */
     public List<Element> complementationList(List<Element> elements, boolean finished, boolean unFinished, boolean books, boolean games, boolean series, boolean films,
                                              boolean rock, boolean borys, boolean rockBorys, boolean others) {
@@ -719,13 +757,24 @@ public class FirebaseRepository {
 
     public void setUserFilters(Filter filters)
     {
-        Log.d("FilterSet", "I'm In");
-
        final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
                .collection("Preferencje")
                 .document("Filters");
+
+        Map<String, Object> userDataFilters = new HashMap<>();
+        userDataFilters.put("isFinished", filters.isFinished());
+        userDataFilters.put("isUnfinished", filters.isUnfinished());
+        userDataFilters.put("isBook", filters.isBook());
+        userDataFilters.put("isFilm", filters.isFilm());
+        userDataFilters.put("isGame", filters.isGame());
+        userDataFilters.put("isSeries", filters.isSeries());
+        userDataFilters.put("isShareRck", filters.isShareRck());
+        userDataFilters.put("isShareBrs", filters.isShareBrs());
+        userDataFilters.put("isShareRckBrs", filters.isShareRckBrs());
+        userDataFilters.put("isShareOther", filters.isShareOther());
+
         listRef
-                .set(filters)
+                .update(userDataFilters)
                 .addOnSuccessListener(success -> {
                     Log.d("FilterSet", "FilterSet success");
 

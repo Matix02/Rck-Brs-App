@@ -17,7 +17,7 @@ import android.widget.Switch;
 
 import java.util.ArrayList;
 
-public class FilterPopActivity extends AppCompatActivity {
+public class FilterPopUpActivity extends AppCompatActivity {
 
     //Załatwić te całe SuppressLint - to jest rzutowanie z Switcha na Switcha z androidx
     String zazWszt = "Zaznacz Wszystko";

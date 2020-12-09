@@ -49,6 +49,19 @@ public class Element {
         this.category = category;
         this.share = share;
     }
+    public Element(String id, String title, String category, String share){
+        this.id = id;
+        this.title = title;
+        this.category = category;
+        this.share = share;
+    }
+    public Element(String id, String title, String category, String share, String state){
+        this.id = id;
+        this.title = title;
+        this.category = category;
+        this.share = share;
+        this.state = state;
+    }
     public Element(String title, String category, String share, boolean isWatched){
         this.title = title;
         this.category = category;
