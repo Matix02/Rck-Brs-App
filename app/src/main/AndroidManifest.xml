@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EditElementActivity"></activity>
+        <activity android:name=".InfoActivity"></activity>
+        <activity android:name=".EditElementActivity" />
         <activity android:name=".RandomDialogActivity" />
         <activity android:name=".FilterPopUpActivity" />
         <activity

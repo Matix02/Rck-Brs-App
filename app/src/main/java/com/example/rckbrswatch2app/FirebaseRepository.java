@@ -520,7 +520,7 @@ public class FirebaseRepository {
 
     public void deleteElement(String userID, String elementId){
         //Usuwa z listy tego właśnie administratora
-        final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID)
+        final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
                 .collection("Lista")
                 .document(elementId);
 
