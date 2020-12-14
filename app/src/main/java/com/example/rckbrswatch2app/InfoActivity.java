@@ -19,13 +19,15 @@ public class InfoActivity extends AppCompatActivity {
         facebookButton = findViewById(R.id.facebookButton);
 
         facebookButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.pl"));
             try {
-                Intent intent =  new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/groups/rckbrs/"));
-                startActivity(intent);
+                intent =  new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/groups/rckbrs/"));
             } catch (Exception e) {
-                Intent intent =  new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com"));
-                startActivity(intent);
-            }
+                intent =  new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com"));
+            } finally {
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+            }}
         });
     }
 }
