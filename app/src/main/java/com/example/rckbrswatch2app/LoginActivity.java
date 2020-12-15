@@ -3,6 +3,7 @@ package com.example.rckbrswatch2app;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
@@ -48,7 +49,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        elementViewModel = ViewModelProviders.of(this).get(ElementViewModel.class);
+        elementViewModel = new ViewModelProvider(this).get(ElementViewModel.class);
 
         singInButton = (Button) findViewById(R.id.login);
         singInButton.setOnClickListener(this);

@@ -63,6 +63,7 @@ public class FirebaseRepository {
     private MutableLiveData<Element> randomElementLiveData = new MutableLiveData<>();
     private List<Element> randomElementsList;
 
+
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
     }
@@ -72,8 +73,6 @@ public class FirebaseRepository {
         //SharedPrefrence do zapisu i odczytu filtracji
 
         mFirestoreElement.collection("Users").document(userID).collection("Lista")
-
-              //  .whereEqualTo("category", "Gra")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.d("ReadFirebase", "ObserveElement has lost a mind" + error);
@@ -237,19 +236,6 @@ public class FirebaseRepository {
             Log.d("AddTransaction", "TransactionADD Failed = " + error);
 
         });
-
-      /*  CollectionReference reference = mFirestoreElement.collection("Users");
-        Task<DocumentReference> referenceTask = reference.add(userData);
-        referenceTask.addOnSuccessListener(documentReference -> {
-            String d = documentReference.getId();
-
-            CollectionReference collectionReference = reference.document(d).collection("Lista");
-            for(Element e: elementList){
-                collectionReference.add(e)
-                .addOnFailureListener(f -> Log.d("Firestore", "Nie udało się zrobić pętli by dodać wszystko"));
-            }
-        })
-        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
     }
     public MutableLiveData<List<Element>> getNews() {
         Map<String, Object> booleanMap = new HashMap<>();
@@ -530,15 +516,30 @@ public class FirebaseRepository {
         //Dodaje do tabeli News dla pozostałych User'ów o statusie User, żeby przy następnym otwarciu został ten element usunięty
         final DocumentReference newsRef = mFirestoreElement.collection("News").document(elementId);
 
+
+
         mFirestoreElement.runTransaction(transaction -> {
+            Date creationDate = new Date();
             DocumentSnapshot snapshot = transaction.get(listRef);
             Element element = snapshot.toObject(Element.class);
+
             assert element != null;
+            element.setState("Delete");
+
+            HashMap<String, Object> deleteElement = new HashMap<>();
+            deleteElement.put("id", element.getId());
+            deleteElement.put("title", element.getTitle());
+            deleteElement.put("category", element.getCategory());
+            deleteElement.put("share", element.getShare());
+            deleteElement.put("isWatched", element.isWatched());
+            deleteElement.put("state", element.getState());
+            deleteElement.put("time", creationDate);
+
             Log.d("DeleteTransaction", "Delete title -> " + element.getTitle());
             transaction.delete(listRef);
             transaction.delete(mainElementsListRef);
-            element.setState("Delete");
-            transaction.set(newsRef, element);
+            transaction.set(newsRef, deleteElement);
+
             return null;
         })
                 .addOnSuccessListener(command -> {
@@ -550,6 +551,7 @@ public class FirebaseRepository {
     }
 
     public void editElement(Element element){
+        Date creationDate = new Date();
         //Edytuje dany element z listy tego właśnie administratora
         final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
                 .collection("Lista")
@@ -562,15 +564,21 @@ public class FirebaseRepository {
         //Dodaje do tabeli News dla pozostałych User'ów o statusie User, żeby przy następnym otwarciu został ten element edytowany
         final DocumentReference newsRef = mFirestoreElement.collection("News").document(element.getId());
 
+        HashMap<String, Object> editElement = new HashMap<>();
+        editElement.put("id", element.getId());
+        editElement.put("title", element.getTitle());
+        editElement.put("category", element.getCategory());
+        editElement.put("share", element.getShare());
+        editElement.put("isWatched", element.isWatched());
+
         mFirestoreElement.runTransaction(transaction -> {
-           // DocumentSnapshot snapshot = transaction.get(listRef);
-           // Element element = snapshot.toObject(Element.class);
-          //  assert element != null;
+            element.setState("Update");
             Log.d("DeleteTransaction", "Delete title -> " + element.getTitle());
             transaction.set(listRef, element);
-            transaction.set(newsRef, element);
-            element.setState("Update");
-            transaction.set(newsRef, element);
+            transaction.set(maineElementsListRef, element);
+            editElement.put("state", element.getState());
+            editElement.put("time", creationDate);
+            transaction.set(newsRef, editElement);
             return null;
         })
                 .addOnSuccessListener(command -> {

@@ -30,21 +30,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     public ElementAdapter(MainActivity mainActivity){
         this.mainActivity = mainActivity;
     }
-    public ElementAdapter(){
-        super();
-    }
-    public static final DiffUtil.ItemCallback<Element> DIFF_CALLBACK = new DiffUtil.ItemCallback<Element>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull Element oldItem, @NonNull Element newItem) {
-            return oldItem.getId().equals(newItem.getId());
-        }
 
-        @SuppressLint("DiffUtilEquals")
-        @Override
-        public boolean areContentsTheSame(@NonNull Element oldItem, @NonNull Element newItem) {
-            return oldItem.equals(newItem);
-        }
-    };
     @NonNull
     @Override
     public ElementHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

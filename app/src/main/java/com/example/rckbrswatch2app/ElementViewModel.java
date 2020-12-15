@@ -35,7 +35,7 @@ public class ElementViewModel extends AndroidViewModel {
     public void getFilterDataNews() { firebaseRepository.filterNews(); }
     public void getLastnNewLogin() { firebaseRepository.getDate(); }
 
-    public void setActiveUserLogin() { firebaseRepository.setTimeLogin(); }
+    //public void setActiveUserLogin() { firebaseRepository.setTimeLogin(); }
     public void singOut() { firebaseRepository.signOut(); }
     public void checkUser(String userID) { firebaseRepository.isUserExist(userID);}
 

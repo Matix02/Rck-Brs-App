@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     ElementAdapter adapter;
     List<Element> elementList = new ArrayList<>();
     List<Element> elementFilterList;
-    boolean gameState;
     List<Element> firebaseFilterList;
     List<Element> firebaseNewsList;
     List<Boolean> isWatchedList;
@@ -44,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
    //private String userID = "mENkJn3iyIQDIqSh3cRc";
 
     //NieKoniecznie taka metoda jest właściwa, bo jest jeszcze Intent.putExtra(UserID); Memoryleaks
-    static final String userID = LoginActivity.userID;
+    static String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +64,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         elementViewModel = new ViewModelProvider(this).get(ElementViewModel.class);
 
         Intent intent = getIntent();
-        String userID = intent.getStringExtra("userID");
+        String localUserID = intent.getStringExtra("userID");
+        Log.d("UserID", "is " + localUserID);
+        userID = localUserID;
         Log.d("UserID", "is " + userID);
 
         long startTime = System.currentTimeMillis();
@@ -81,20 +82,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 firebaseNewsList.addAll(elements);
                 Log.d("Firestore", "MainActivity firebaseNews size is " + firebaseNewsList.size());
                 Log.d("Firestore", "#CounterNews is " + counterNews++);
-
             });
         });
 
      //   elementViewModel.getFilterDataNews();
         elementViewModel.getLastnNewLogin();
-        elementViewModel.setActiveUserLogin();
+      //  elementViewModel.setActiveUserLogin();
 
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
         Log.d("TimeBufor", "Time is " + duration+" ms");
 
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
@@ -113,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         floatingActionAddButton.setOnClickListener(v -> {
             Intent intentToAdd = new Intent(MainActivity.this, EditElementActivity.class);
             startActivityForResult(intentToAdd, ADD_ELEMENT_REQUEST);
-
         });
 
         adapter.setOnItemClickListener(element -> {
@@ -124,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             elementIntent.putExtra(EditElementActivity.EXTRA_CATEGORY, element.getCategory());
             elementIntent.putExtra(EditElementActivity.EXTRA_SHARE, element.getShare());
             elementIntent.putExtra(EditElementActivity.EXTRA_IS_WATCHED, element.isWatched());
-
             startActivityForResult(elementIntent, EDIT_ELEMENT_REQUEST);
         });
     }
@@ -174,36 +171,25 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case R.id.filter:
                 intent = new Intent(getApplicationContext(), FilterPopUpActivity.class);
                 startActivity(intent);
-                //elementViewModel.updateTrigger(5, "title");
                 return true;
             case R.id.settings:
-               /* intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);*/
                intent = new Intent(MainActivity.this, RandomDialogActivity.class);
                startActivity(intent);
                 return true;
             case R.id.addF:
-                //Element element = new Element("Hello", "Film", true, "Rock");
-               // elementViewModel.createFirebaseElement(element);
-                //elementViewModel.addElement(userID);
                 intent = new Intent(MainActivity.this, InfoActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.deleteRoom:
-              //  elementViewModel.deleteAllElements();
                 intent = new Intent(MainActivity.this, FiltersDialogActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.signOut:
-                //Element element = new Element("Hello", "Film", true, "Rock");
-                // elementViewModel.createFirebaseElement(element);
-                //elementViewModel.addDocument();
                 elementViewModel.singOut();
-                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(loginIntent);
+                intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
                 finish();
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -241,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             String share = data.getStringExtra(EditElementActivity.EXTRA_SHARE);
             boolean isWatched = data.getBooleanExtra(EditElementActivity.EXTRA_IS_WATCHED, false);
 
-            Element element = new Element(id, title, category, share);
+            Element element = new Element(id, title, category, isWatched, share);
             elementViewModel.editElement(element);
         } else {
             Toast.makeText(this, "Nie udało się dodać Elementu", Toast.LENGTH_LONG).show();

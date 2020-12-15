@@ -22,8 +22,44 @@
         android:id="@+id/facebookButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Click Me"
+        android:text="Click My Facebook"
         app:layout_constraintTop_toBottomOf="@id/facebookTV"
+        />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/youTubeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Click My YouTube"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/facebookButton"
+        />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/spotifyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Click My Spotify"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/youTubeButton"
+        />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/linkedinButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Click My Linkedin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spotifyButton"
+        />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/gitHubButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Click My GitHub"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linkedinButton"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
