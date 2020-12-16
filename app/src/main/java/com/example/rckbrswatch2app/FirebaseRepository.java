@@ -62,6 +62,8 @@ public class FirebaseRepository {
     //Random - sprawdzic czy mozna uzyc tej samej liveData?
     private MutableLiveData<Element> randomElementLiveData = new MutableLiveData<>();
     private List<Element> randomElementsList;
+    //Test with USerID
+    private MutableLiveData<String> userIDLiveData = new MutableLiveData<>();
 
 
     public FirebaseRepository() {
@@ -70,6 +72,9 @@ public class FirebaseRepository {
 
     public MutableLiveData<List<Element>> readFirestoreElements(String userID){
         currentUserID = userID;
+        userIDLiveData.setValue(userID);
+        Log.d("MutLiveData", "User Id in MutableLiveData is " + userIDLiveData.getValue());
+
         //SharedPrefrence do zapisu i odczytu filtracji
 
         mFirestoreElement.collection("Users").document(userID).collection("Lista")
@@ -122,7 +127,6 @@ public class FirebaseRepository {
         });
         return isWatchedLiveData;
     }
-
     public MutableLiveData<List<Element>> readFirebaseElements(){
         elementList = new ArrayList<>();
         Query query = mReferenceElement.orderByChild("category").equalTo("Gra");
@@ -145,7 +149,6 @@ public class FirebaseRepository {
         });
         return elementLiveData;
     }
-
     public void registerOutsideUser(User newUser){
         String newUserID = newUser.getUserID();
 
@@ -185,20 +188,6 @@ public class FirebaseRepository {
                     });
         })
                 .addOnFailureListener(e -> Log.d("RegisterOutsideUser", "Nie udało się dodać Użytkownika " + e.getMessage()));
-       /* Dodawanie Dokuemntów i Kolekcji w jednym, zatrzymując też ID nowo stworzonego elementu
-       * Kopia z Bazą dla CollectionReference*/
-      /* CollectionReference reference = mFirestoreElement.collection("Users");
-        Task<DocumentReference> referenceTask = reference.add(userData);
-        referenceTask.addOnSuccessListener(documentReference -> {
-            String d = documentReference.getId();
-
-            CollectionReference collectionReference = reference.document(d).collection("Lista");
-            for(Element e: elementList){
-                collectionReference.add(e)
-                .addOnFailureListener(f -> Log.d("Firestore", "Nie udało się zrobić pętli by dodać wszystko"));
-            }
-        })
-        .addOnFailureListener(e -> Log.d("Firestore", "Nie udało się dodać Użytkownika"));*/
     }
     public void addNewElement(Element element){
         //Element element = new Element("Cyberpunk2077", "Gra", false, "Rck&Brs");
@@ -237,31 +226,28 @@ public class FirebaseRepository {
 
         });
     }
-    public MutableLiveData<List<Element>> getNews() {
+    //** GetNews Original **//
+    /*public MutableLiveData<List<Element>> getNews() {
         Map<String, Object> booleanMap = new HashMap<>();
         // Zwraca listę oglądanych Id i Oglądanych IsWatched danego użytkownika
         String userID = "1";
         /*Zwraca tabelę News'ów. Nowości są zbierane, albo po włączeniu aplikacji albo w tracie, poprzez(...)*/
-
-        mFirestoreElement.collection("News").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                if(error != null){
-                    Log.d("Firestore", "News Listener is DEAD");
-                    return;
+/*
+        mFirestoreElement.collection("News").addSnapshotListener((value, error) -> {
+            if(error != null){
+                Log.d("Firestore", "News Listener is DEAD");
+                return;
+            }
+            newsList = new ArrayList<>();
+            assert value != null;
+            for(QueryDocumentSnapshot documentSnapshot : value)
+                {
+                    Log.d("Firestore2", "News data => " + documentSnapshot.getData());
+                    newsList.add(documentSnapshot.toObject(Element.class));
                 }
-
-                newsList = new ArrayList<>();
-                assert value != null;
-                for(QueryDocumentSnapshot documentSnapshot : value)
-                    {
-                        Log.d("Firestore2", "News data => " + documentSnapshot.getData());
-                        newsList.add(documentSnapshot.toObject(Element.class));
-                    }
-                    newsElementLiveData.postValue(newsList);
-                    Log.d("Firestore2", "News data/size => " + newsList.size());
-                }
-        });
+                newsElementLiveData.postValue(newsList);
+                Log.d("Firestore2", "News data/size => " + newsList.size());
+            });
         return newsElementLiveData;
        /*  NotActual-outdated Plan:
         1.Rejestracja:
@@ -300,9 +286,21 @@ public class FirebaseRepository {
                             } else {
                                 Log.d("Firesotre2", "! News error = " + documentSnapshot.getException());
                             }
-                });*/
-    }
+                });*/ /*
+    }*/
 
+    public void getNews() {
+        String currentUserID = userIDLiveData.getValue();
+        mFirestoreElement.collection("News").addSnapshotListener((value, error) -> {
+            if(error != null){
+                Log.d("Firestore", "News Listener is DEAD");
+                return;
+            }
+            if (value != null)
+                updateList(currentUserID, "NewLogin");
+                Log.d("Firestore2", "News data/size => ");
+        });
+    }
     public void getDate(){
         //Zwracanie dat logowania użytkownika (aktualnego i poprzedniego zalogowania)
         mFirestoreElement.collection("Users").document(userID)
@@ -366,55 +364,38 @@ public class FirebaseRepository {
                         Log.d("FilterStore", "NewsDataTable error");
                 });*/
     }
+
     public void setTimeLogin(){
-        transTime();
+        String currentUserID = userIDLiveData.getValue();
         //Aktualizuje podane dane, wraz z możliwością dostoswania ilości pól, i akutalizacji daty na tą aktualną w normalnym formacie
-    }
-    public void transTime(){
-        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
+        assert currentUserID != null;
+        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(currentUserID);
+        Log.d("MutableUserIdLiveData", "In SetTimeLogin userLiveData is " + currentUserID);
 
         mFirestoreElement.runTransaction(transaction -> {
             Date actualDate = new Date();
             DocumentSnapshot snapshot = transaction.get(userLogRef);
             Date newUserLoginTime = snapshot.getDate("NewLogin");
-           // transaction.update(userLogRef, "LastLogin", newUserLoginTime, "NewLogin", actualDate);
+            transaction.update(userLogRef, "LastLogin", newUserLoginTime, "NewLogin", actualDate);
             //Pamiętać o zrobieniu z tego nulla, bo i po co - return'a
             return newUserLoginTime;
         })
                 .addOnSuccessListener(command -> {
                     Log.d("Firestore", "TransactionTime success ");
-
-                    transList();
+                    updateList(currentUserID, "LastLogin");
                 })
                 .addOnFailureListener(error -> {
                     Log.d("Firestore", "Transaction failed because of " + error);
                 });
     }
-
-    //Spradza użytkownika, nie możliwe do wykorzystania
-    public void isUserExist(String userID){
-        boolean isUserExists;
-        mFirestoreElement.collection("Users").document(userID)
-                .get()
-                .addOnSuccessListener(success -> {
-                    if (success.exists())
-                        Log.d("UserSearch", "True");
-                })
-                .addOnFailureListener(failure -> {
-                    Log.d("UserSearch", "False");
-                });
-    }
-
-    public void transList() {
-        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
+    public void updateList(String currentUserID, String typeTimeLogin) {
+        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(currentUserID);
         final CollectionReference newsListRef = mFirestoreElement.collection("News");
         Log.d("DatabaseSize", "Size of this db in repository is " + elementList.size());
-        /* Lista Randomowa
-        getRandomElement("Gra");*/
         mFirestoreElement.runTransaction(transaction -> {
             //Date Section
             DocumentSnapshot snapshot = transaction.get(userLogRef);
-            Date oldUserLoginTime = snapshot.getDate("LastLogin");
+            Date oldUserLoginTime = snapshot.getDate(typeTimeLogin);
             Log.d("Firestore", "TransactionList | NewLogin is " + oldUserLoginTime);
             //NewsList Section
             assert oldUserLoginTime != null;
@@ -425,7 +406,7 @@ public class FirebaseRepository {
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(command.getResult())){
                                 Log.d("FilterStore", "TransactionNewsData - NewsDataTable => " + document.toObject(Element.class)); //Sprawdzić elementy w tym elemencie po przepisaniu
                                 Element element = document.toObject(Element.class);
-                                updateMainList(document, element);
+                                updateMainList(document, element, currentUserID);
                             //Wywołanie innej transakcji, która będzie dodawać, edytować bądź usuwać elementy z NewsTable
                         }}
                         else
@@ -441,11 +422,11 @@ public class FirebaseRepository {
                 });
     }
 
-    public void updateMainList(QueryDocumentSnapshot document, Element element){
+    public void updateMainList(QueryDocumentSnapshot document, Element element, String currentUserID){
         String fieldType = (String) document.get("state");
         String docId = document.getId();
 
-        final DocumentReference userListDocRef = mFirestoreElement.collection("Users").document(userID).collection("Lista").document(docId);
+        final DocumentReference userListDocRef = mFirestoreElement.collection("Users").document(currentUserID).collection("Lista").document(docId);
         assert fieldType != null;
         switch (fieldType) {
             case "New":
@@ -487,7 +468,19 @@ public class FirebaseRepository {
                 break;
         }
     }
-
+    //Spradza użytkownika, nie możliwe do wykorzystania
+    public void isUserExist(String userID){
+        boolean isUserExists;
+        mFirestoreElement.collection("Users").document(userID)
+                .get()
+                .addOnSuccessListener(success -> {
+                    if (success.exists())
+                        Log.d("UserSearch", "True");
+                })
+                .addOnFailureListener(failure -> {
+                    Log.d("UserSearch", "False");
+                });
+    }
     //Niedokończone, trzeba mieć podłączony backend - repository z UI
     public void updateWatchElement(Element element){
         DocumentReference listRef = mFirestoreElement.collection("Users").document(currentUserID).collection("Lista")
@@ -569,7 +562,7 @@ public class FirebaseRepository {
         editElement.put("title", element.getTitle());
         editElement.put("category", element.getCategory());
         editElement.put("share", element.getShare());
-        editElement.put("isWatched", element.isWatched());
+       // editElement.put("isWatched", element.isWatched());
 
         mFirestoreElement.runTransaction(transaction -> {
             element.setState("Update");
