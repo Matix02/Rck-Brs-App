@@ -382,7 +382,7 @@ public class FirebaseRepository {
         })
                 .addOnSuccessListener(command -> {
                     Log.d("Firestore", "TransactionTime success ");
-                    updateList(currentUserID, "LastLogin");
+                    updateList(currentUserID, "NewLogin");
                 })
                 .addOnFailureListener(error -> {
                     Log.d("Firestore", "Transaction failed because of " + error);
@@ -431,7 +431,13 @@ public class FirebaseRepository {
         switch (fieldType) {
             case "New":
                 mFirestoreElement.runTransaction(transaction -> {
-                    //  DocumentSnapshot snapshot = transaction.get(userListDocRef);
+                    DocumentSnapshot snapshot = transaction.get(userListDocRef);
+
+                    if (snapshot.exists()) {
+                        boolean updateWatch = snapshot.getBoolean("isWatched");
+                        Log.d("Boolstore", "isWatched of this element = " + updateWatch);
+                        element.setWatched(updateWatch);
+                    }
                     transaction.set(userListDocRef, element);
                     return null;
                 }).addOnSuccessListener(success -> {
@@ -454,9 +460,17 @@ public class FirebaseRepository {
                 break;
             case "Update":
                 mFirestoreElement.runTransaction(transaction -> {
-                    transaction.update(userListDocRef, "title", element.getTitle());
-                    transaction.update(userListDocRef, "share", element.getShare());
-                    transaction.update(userListDocRef, "category", element.getCategory());
+                    DocumentSnapshot snapshot = transaction.get(userListDocRef);
+
+                    if (!snapshot.exists()){
+                        transaction.set(userListDocRef, element);
+                    }
+                    else {
+                        transaction.update(userListDocRef, "title", element.getTitle());
+                        transaction.update(userListDocRef, "share", element.getShare());
+                        transaction.update(userListDocRef, "category", element.getCategory());
+                    }
+
 
                     return null;
                 }).addOnSuccessListener(success -> {

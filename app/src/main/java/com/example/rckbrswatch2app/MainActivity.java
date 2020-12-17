@@ -77,12 +77,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Log.d("Firebase", "Main firebase Elements size is " + firebaseFilterList.size());
             adapter.setElementList(firebaseFilterList);
             Log.d("Firestore", "#CounterData is " + counterData++);
-            elementViewModel.getNewsCollection();
         });
+        elementViewModel.getNewsCollection();
 
      //   elementViewModel.getFilterDataNews();
         elementViewModel.getLastnNewLogin();
-
+        //Zapisuej dane logowania daty
+        elementViewModel.setActiveUserLogin();
 
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
