@@ -1,6 +1,8 @@
 package com.example.rckbrswatch2app;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -61,18 +63,21 @@ public class FiltersDialogActivity extends AppCompatActivity{
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Filters");
 
-        viewModel.getUserFilters().observe(this, filter1 -> {
-            Filter filter = filter1;
-            finishSwitch.setChecked(filter.isFinished());
-            unFinishSwitch.setChecked(filter.isUnfinished());
-            filmsChBox.setChecked(filter.isFilm());
-            seriesChBox.setChecked(filter.isSeries());
-            booksChBox.setChecked(filter.isBook());
-            gamesChBox.setChecked(filter.isGame());
-            rckSwitch.setChecked(filter.isShareRck());
-            brsSwitch.setChecked(filter.isShareBrs());
-            rcknBrsSwitch.setChecked(filter.isShareRckBrs());
-            othersSwitch.setChecked(filter.isShareOther());
+        Intent intent = getIntent();
+        String localUserID = intent.getStringExtra("userID");
+        Log.d("UserID", "is " + localUserID + " in Filter");
+
+        viewModel.getUserFilters(localUserID).observe(this, filter1 -> {
+            finishSwitch.setChecked(filter1.isFinished());
+            unFinishSwitch.setChecked(filter1.isUnfinished());
+            filmsChBox.setChecked(filter1.isFilm());
+            seriesChBox.setChecked(filter1.isSeries());
+            booksChBox.setChecked(filter1.isBook());
+            gamesChBox.setChecked(filter1.isGame());
+            rckSwitch.setChecked(filter1.isShareRck());
+            brsSwitch.setChecked(filter1.isShareBrs());
+            rcknBrsSwitch.setChecked(filter1.isShareRckBrs());
+            othersSwitch.setChecked(filter1.isShareOther());
         });
 
         shareSelAllButton.setOnClickListener(click -> {
@@ -103,6 +108,7 @@ public class FiltersDialogActivity extends AppCompatActivity{
             currentFilters.setShareOther(othersSwitch.isChecked());
 
             viewModel.setFilters(currentFilters);
+
         });
     }
 

@@ -30,7 +30,6 @@ import com.google.firebase.database.Transaction;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final int RC_SIGN_IN = 9001;
-    private Button singInButton;
 
     private FirebaseAuth mAuth;
 
@@ -38,7 +37,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ElementViewModel elementViewModel;
 
     //sprawdzić
-    protected static String userID;
+    protected String userID;
 
     SharedPreferences sharedPreferences;
 
@@ -51,7 +50,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         elementViewModel = new ViewModelProvider(this).get(ElementViewModel.class);
 
-        singInButton = (Button) findViewById(R.id.login);
+        Button singInButton = (Button) findViewById(R.id.login);
         singInButton.setOnClickListener(this);
 
         // Configure Google Sign In

@@ -26,7 +26,7 @@ public class ElementViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Boolean>> readFavDocumentFirestore (){ return  firebaseRepository.readUserFavElementsDocument(); }
-    public LiveData<List<Element>> readFirestore (String userID){ return firebaseRepository.readFirestoreElements(userID); }
+    public LiveData<List<Element>> readFirestore (String userID, Filter filter){ return firebaseRepository.readFirestoreElements(userID, filter); }
     public void getNewsCollection(){ firebaseRepository.getNews(); }
 
     public void registerUserOutside(User user){ firebaseRepository.registerOutsideUser(user); }
@@ -49,6 +49,6 @@ public class ElementViewModel extends AndroidViewModel {
 
     public void editElement(Element element) { firebaseRepository.editElement(element); }
 
-    public LiveData<Filter> getUserFilters(){ return firebaseRepository.getUserFilter(); }
+    public LiveData<Filter> getUserFilters(String userID){ return firebaseRepository.getUserFilter(userID); }
     //*********************FirestoreOperations //////////////*******************
 }

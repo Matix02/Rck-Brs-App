@@ -37,13 +37,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     List<Element> elementFilterList;
     List<Element> firebaseFilterList;
     List<Element> firebaseNewsList;
-    List<Boolean> isWatchedList;
-    static int counterNews = 0;
     static int counterData = 0;
    //private String userID = "mENkJn3iyIQDIqSh3cRc";
 
     //NieKoniecznie taka metoda jest właściwa, bo jest jeszcze Intent.putExtra(UserID); Memoryleaks
-    static String userID;
+    String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +69,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         long startTime = System.currentTimeMillis();
 
-        elementViewModel.readFirestore(userID).observe(this , elementsList -> {
+        elementViewModel.getUserFilters(userID).observe(this, filter -> {
+        elementViewModel.readFirestore(userID, filter).observe(this , elementsList -> {
             firebaseFilterList = new ArrayList<>();
             firebaseFilterList.addAll(elementsList);
             Log.d("Firebase", "Main firebase Elements size is " + firebaseFilterList.size());
             adapter.setElementList(firebaseFilterList);
             Log.d("Firestore", "#CounterData is " + counterData++);
+        });
         });
         elementViewModel.getNewsCollection();
 
@@ -178,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             case R.id.deleteRoom:
                 intent = new Intent(MainActivity.this, FiltersDialogActivity.class);
+                intent.putExtra("userID", userID);
+                Log.d("LoginID", "userID to the filters" + userID);
                 startActivity(intent);
                 return true;
             case R.id.signOut:

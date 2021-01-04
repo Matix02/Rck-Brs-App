@@ -70,7 +70,7 @@ public class FirebaseRepository {
         mFirestoreElement = FirebaseFirestore.getInstance();
     }
 
-    public MutableLiveData<List<Element>> readFirestoreElements(String userID){
+    public MutableLiveData<List<Element>> readFirestoreElements(String userID, Filter filter){
         currentUserID = userID;
         userIDLiveData.setValue(userID);
         Log.d("MutLiveData", "User Id in MutableLiveData is " + userIDLiveData.getValue());
@@ -94,12 +94,12 @@ public class FirebaseRepository {
 
                     List<Element> sharedList = new ArrayList<>(elementList);
                     Log.d("Firestore2", "ShareList BEFORE data/size => " + sharedList.size());
-                    sharedList = complementationList(sharedList, true, false, true, true, true, true, true, true, true, true);
+                    sharedList = complementationList(sharedList, filter);
                     Log.d("Firestore2", "ShareList AFTER data/size => " + sharedList.size());
                     // registerUser("Johnny", "silverhand@nightcity.pl", "Samurai");
                     /* Odwracanie, uaktywnwnićjeśli wydajność będzie na dobrym poziomie - sfera dodatkowa
                     Collections.reverse(elementList); */
-                    elementLiveData.postValue(elementList);
+                    elementLiveData.postValue(sharedList);
                 });
         return elementLiveData;
     }
@@ -127,28 +127,7 @@ public class FirebaseRepository {
         });
         return isWatchedLiveData;
     }
-    public MutableLiveData<List<Element>> readFirebaseElements(){
-        elementList = new ArrayList<>();
-        Query query = mReferenceElement.orderByChild("category").equalTo("Gra");
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    elementList.clear();
-                    for(DataSnapshot keyNode : snapshot.getChildren())
-                    {
-                        Element element = keyNode.getValue(Element.class);
-                        elementList.add(element);
-                    }
-                    Log.d("Xkanapka", "Size = " + elementList.size());
-                    elementLiveData.postValue(elementList);
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
-        return elementLiveData;
-    }
+
     public void registerOutsideUser(User newUser){
         String newUserID = newUser.getUserID();
 
@@ -366,10 +345,13 @@ public class FirebaseRepository {
     }
 
     public void setTimeLogin(){
+        //** Nie dziala tu userID
         String currentUserID = userIDLiveData.getValue();
         //Aktualizuje podane dane, wraz z możliwością dostoswania ilości pól, i akutalizacji daty na tą aktualną w normalnym formacie
         assert currentUserID != null;
-        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(currentUserID);
+        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(
+                "osJ8vFzCZIVaSgwe8UGxjPftukh2"
+        );
         Log.d("MutableUserIdLiveData", "In SetTimeLogin userLiveData is " + currentUserID);
 
         mFirestoreElement.runTransaction(transaction -> {
@@ -389,9 +371,12 @@ public class FirebaseRepository {
                 });
     }
     public void updateList(String currentUserID, String typeTimeLogin) {
-        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(currentUserID);
+        // ** Tu tez nie dziala userID
+        final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(
+                "osJ8vFzCZIVaSgwe8UGxjPftukh2"
+        );
         final CollectionReference newsListRef = mFirestoreElement.collection("News");
-        Log.d("DatabaseSize", "Size of this db in repository is " + elementList.size());
+        //Log.d("DatabaseSize", "Size of this db in repository is " + elementList.size());
         mFirestoreElement.runTransaction(transaction -> {
             //Date Section
             DocumentSnapshot snapshot = transaction.get(userLogRef);
@@ -662,25 +647,30 @@ public class FirebaseRepository {
         return randomElementLiveData;
     }
 
-    /* !!! Filtracja !!! */
-    public List<Element> complementationList(List<Element> elements, boolean finished, boolean unFinished, boolean books, boolean games, boolean series, boolean films,
-                                             boolean rock, boolean borys, boolean rockBorys, boolean others) {
+    public void createFirebaseElement(Element element) {
+        mReferenceElement.push().setValue(element);
+    }
 
-        List<Element> elementFilters = new ArrayList<>();
+    public void signOut() {
+        FirebaseAuth.getInstance().signOut();
+    }
+
+    /* !!! Filtracja Listy!!! */
+    public List<Element> complementationList(List<Element> elements, Filter filter) {
 
         List<Element> completeList;
 
-       /* boolean finished = elementFilters.get(0).isFinished();
-        boolean unFinished = elementFilters.get(0).isUnFinished();
-        boolean books = elementFilters.get(0).isBookCategory();
-        boolean games = elementFilters.get(0).isGamesCategory();
-        boolean series = elementFilters.get(0).isSeriesCategory();
-        boolean films = elementFilters.get(0).isFilmCategory();
-        boolean rock = elementFilters.get(0).isRockRecommedation();
-        boolean borys = elementFilters.get(0).isBorysRecommedation();
-        boolean rockBorys = elementFilters.get(0).isRockBorysRecommedation();
-        boolean others = elementFilters.get(0).isOtherRecommedation();
-*/
+        boolean finished = filter.isFinished();
+        boolean unFinished = filter.isUnfinished();
+        boolean books = filter.isBook();
+        boolean games = filter.isGame();
+        boolean series = filter.isSeries();
+        boolean films = filter.isFilm();
+        boolean rock = filter.isShareRck();
+        boolean borys = filter.isShareBrs();
+        boolean rockBorys = filter.isShareRckBrs();
+        boolean others = filter.isShareOther();
+
         //#1 Oglądane i Nieoglądane
         if (finished && !unFinished)
             completeList = elements.stream().filter(Element::isWatched).collect(Collectors.toList());
@@ -742,36 +732,38 @@ public class FirebaseRepository {
     /* !!! Koniec Filtracji !!! */
 
 
-    public void createFirebaseElement(Element element) {
-        mReferenceElement.push().setValue(element);
-    }
-
-    public void signOut() {
-        FirebaseAuth.getInstance().signOut();
-    }
-    //*************Filter Section****************
-    public MutableLiveData<Filter> getUserFilter(){
-        final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
+    //*************Filtracja pobór****************
+    public MutableLiveData<Filter> getUserFilter(String userID){
+        final DocumentReference listRef = mFirestoreElement.collection("Users").document(userID)
                 .collection("Preferencje")
                 .document("Filters");
 
-        listRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-                assert documentSnapshot != null;
-                if (documentSnapshot.exists()) {
-                    Filter filter = documentSnapshot.toObject(Filter.class);
-                    filtersLiveData.postValue(filter);
-                } else
-                    Log.d("FilterSection", "Something wrong with document after Successfull " + task.getException());
-            } else
-                Log.d("FilterSeciont", " Something wrong with Main document task " + task.getException());
+        listRef.addSnapshotListener((value, error) -> {
+
+            if (error != null) {
+                Log.d("MainGetFilter", "Dead filters");
+                return;
+            }
+
+            if (value != null && value.exists()){
+                Filter filter = value.toObject(Filter.class);
+                filtersLiveData.postValue(filter);
+                Log.d("MainGetFilter", "Working FIlters");
+
+            } else {
+                Log.d("MainGetFilter", "Dead filters");
+            }
         });
+
         return filtersLiveData;
     }
 
     public void setUserFilters(Filter filters)
     {
+        String currentUserID = userIDLiveData.getValue();
+
+        Log.d("Firestore", "userFilter" + currentUserID);
+
        final DocumentReference listRef = mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
                .collection("Preferencje")
                 .document("Filters");
