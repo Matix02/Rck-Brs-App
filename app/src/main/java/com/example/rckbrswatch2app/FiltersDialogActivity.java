@@ -36,11 +36,6 @@ public class FiltersDialogActivity extends AppCompatActivity{
     private AppCompatButton shareSelAllButton;
     private AppCompatButton saveButton;
 
-    FiltersAdapter filtersAdapter;
-    //Z Zew. menu
-    AppCompatButton resetButton;
-    //ViewModel
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +102,7 @@ public class FiltersDialogActivity extends AppCompatActivity{
             currentFilters.setShareRckBrs(rcknBrsSwitch.isChecked());
             currentFilters.setShareOther(othersSwitch.isChecked());
 
-            viewModel.setFilters(currentFilters);
+            viewModel.setFilters(localUserID, currentFilters);
 
         });
     }

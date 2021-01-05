@@ -10,7 +10,7 @@ public class Element {
     private String state;
 
     Element() {}
-    public Element(boolean isWatched, String share,String title, String category) {
+    public Element(boolean isWatched, String share, String title, String category) {
         this.title = title;
         this.category = category;
         this.isWatched = isWatched;
@@ -96,8 +96,8 @@ public class Element {
         return isWatched;
     }
 
-    public void setWatched(boolean watched) {
-        isWatched = watched;
+    public void setWatched(boolean isWatched) {
+        this.isWatched = isWatched;
     }
 
     public String getShare() { return share; }

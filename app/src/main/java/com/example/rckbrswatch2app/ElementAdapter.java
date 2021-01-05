@@ -1,7 +1,5 @@
 package com.example.rckbrswatch2app;
 
-import android.annotation.SuppressLint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +8,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
-
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -24,7 +20,7 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
     private List<Element> elementList = new ArrayList<>();
     private List<Element> elementListAll;
     private OnItemClickListener listener;
-    //Mój szajs
+
     MainActivity mainActivity;
 
     public ElementAdapter(MainActivity mainActivity){
@@ -89,9 +85,8 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             elementList.clear();
-           // setElementList((List<Element>) results.values);
-           elementList.addAll((Collection<? extends Element>) results.values);
-           notifyDataSetChanged();
+            elementList.addAll((Collection<? extends Element>) results.values);
+            notifyDataSetChanged();
         }
     };
 
@@ -102,7 +97,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
         private CheckBox checkBoxWatch;
         private TextView textViewShare;
 
-
         public ElementHolder(@NonNull View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.titleTV);
@@ -112,11 +106,10 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
 
             checkBoxWatch.setOnClickListener(v -> {
                 int position = getAdapterPosition();
-                    Element element = elementList.get(position);
-                    Log.d("Bufor", "ONCHECKBOX before is " + element.isWatched());
-                    element.setWatched(!element.isWatched());
-                    mainActivity.elementViewModel.updateWatchedElement(element);
-                    Log.d("Bufor", "ONCHECKBOX after is " + element.isWatched());
+                Element element = elementList.get(position);
+                element.setWatched(!element.isWatched());
+                String userID = mainActivity.userID;
+                mainActivity.elementViewModel.updateWatchedElement(userID, element);
             });
 
             itemView.setOnClickListener(v -> {
