@@ -58,10 +58,6 @@
             android:checked="true"
             />
     </RadioGroup>
-    <!-- do zastanowienia się -->
-    <View
-        style="@style/Divider.Vertical"
-        tools:ignore="MissingConstraints" />
 
     <RadioGroup
         android:id="@+id/shareRadioG"

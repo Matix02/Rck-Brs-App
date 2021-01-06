@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,9 +20,6 @@ import java.util.Objects;
 
 public class FiltersDialogActivity extends AppCompatActivity{
 
-    private String unSelectedAllShareText = "Zaznacz Wszystko";
-    private String selectedAllShareText = "Odznacz Wszystko";
-
     private SwitchCompat finishSwitch;
     private SwitchCompat unFinishSwitch;
     private AppCompatCheckBox filmsChBox;
@@ -32,9 +30,6 @@ public class FiltersDialogActivity extends AppCompatActivity{
     private SwitchCompat brsSwitch;
     private SwitchCompat rcknBrsSwitch;
     private SwitchCompat othersSwitch;
-    private AppCompatButton categorySelAllButton;
-    private AppCompatButton shareSelAllButton;
-    private AppCompatButton saveButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,9 +46,9 @@ public class FiltersDialogActivity extends AppCompatActivity{
         brsSwitch = findViewById(R.id.BrsSWx);
         rcknBrsSwitch = findViewById(R.id.RckBrsSWx);
         othersSwitch = findViewById(R.id.InneSWx);
-        categorySelAllButton = findViewById(R.id.zaznaczWszystkeKategorieBT);
-        shareSelAllButton = findViewById(R.id.zaznaczWszystkoPolecaneBT);
-        saveButton = findViewById(R.id.saveBTx);
+        AppCompatButton categorySelAllButton = findViewById(R.id.zaznaczWszystkeKategorieBT);
+        AppCompatButton shareSelAllButton = findViewById(R.id.zaznaczWszystkoPolecaneBT);
+        AppCompatButton saveButton = findViewById(R.id.saveBTx);
 
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Filters");
@@ -76,11 +71,6 @@ public class FiltersDialogActivity extends AppCompatActivity{
         });
 
         shareSelAllButton.setOnClickListener(click -> {
-           /* if(rckSwitch.isChecked() && brsSwitch.isChecked() && rcknBrsSwitch.isChecked() && othersSwitch.isChecked()) {
-                shareSelAllButton.setText(selectedAllShareText);
-            } else {
-                resetSharesControls();
-            }*/
            resetSharesControls();
         });
 
@@ -88,23 +78,38 @@ public class FiltersDialogActivity extends AppCompatActivity{
             resetCategoryControls();
         });
 
-
         saveButton.setOnClickListener(click -> {
-            Filter currentFilters = new Filter();
-            currentFilters.setFinished(finishSwitch.isChecked());
-            currentFilters.setUnfinished(unFinishSwitch.isChecked());
-            currentFilters.setFilm(filmsChBox.isChecked());
-            currentFilters.setSeries(seriesChBox.isChecked());
-            currentFilters.setBook(booksChBox.isChecked());
-            currentFilters.setGame(gamesChBox.isChecked());
-            currentFilters.setShareRck(rckSwitch.isChecked());
-            currentFilters.setShareBrs(brsSwitch.isChecked());
-            currentFilters.setShareRckBrs(rcknBrsSwitch.isChecked());
-            currentFilters.setShareOther(othersSwitch.isChecked());
+            if (!rckSwitch.isChecked() && !brsSwitch.isChecked() && !rcknBrsSwitch.isChecked() && !othersSwitch.isChecked()) {
+                Toast.makeText(this, "Nie wybrano Rekomendacji", Toast.LENGTH_LONG).show();
+            }
+            else if (!filmsChBox.isChecked() && !gamesChBox.isChecked() && !seriesChBox.isChecked() && !booksChBox.isChecked()) {
+                Toast.makeText(this, "Nie wybrano Kategorii", Toast.LENGTH_LONG).show();
+            } else {
+                Filter currentFilters = new Filter();
+                currentFilters.setFinished(finishSwitch.isChecked());
+                currentFilters.setUnfinished(unFinishSwitch.isChecked());
+                currentFilters.setFilm(filmsChBox.isChecked());
+                currentFilters.setSeries(seriesChBox.isChecked());
+                currentFilters.setBook(booksChBox.isChecked());
+                currentFilters.setGame(gamesChBox.isChecked());
+                currentFilters.setShareRck(rckSwitch.isChecked());
+                currentFilters.setShareBrs(brsSwitch.isChecked());
+                currentFilters.setShareRckBrs(rcknBrsSwitch.isChecked());
+                currentFilters.setShareOther(othersSwitch.isChecked());
 
-            viewModel.setFilters(localUserID, currentFilters);
-
+                viewModel.setFilters(localUserID, currentFilters);
+                finish();
+            }
         });
+
+        finishSwitch.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            if (!unFinishSwitch.isChecked() && !isChecked)
+                unFinishSwitch.setChecked(true);
+        }));
+        unFinishSwitch.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            if (!finishSwitch.isChecked() && !isChecked)
+                finishSwitch.setChecked(true);
+        }));
     }
 
     @Override
@@ -116,13 +121,14 @@ public class FiltersDialogActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.reset_filter) {//saveFilterResult();
-            resetlAllFilter();
+        if (item.getItemId() == R.id.reset_filter) {
+            resetAllFilter();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    public void resetlAllFilter(){
+
+    public void resetAllFilter(){
         finishSwitch.setChecked(true);
         unFinishSwitch.setChecked(true);
         resetCategoryControls();
@@ -134,7 +140,6 @@ public class FiltersDialogActivity extends AppCompatActivity{
         brsSwitch.setChecked(true);
         rcknBrsSwitch.setChecked(true);
         othersSwitch.setChecked(true);
-     //   shareSelAllButton.setText(unSelectedAllShareText);
     }
 
     public void resetCategoryControls(){
@@ -142,6 +147,5 @@ public class FiltersDialogActivity extends AppCompatActivity{
         seriesChBox.setChecked(true);
         booksChBox.setChecked(true);
         gamesChBox.setChecked(true);
-     //   categorySelAllButton.setText(unSelectedAllShareText);
     }
 }

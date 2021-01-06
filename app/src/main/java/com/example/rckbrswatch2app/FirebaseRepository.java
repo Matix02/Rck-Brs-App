@@ -14,7 +14,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,18 +26,10 @@ public class FirebaseRepository {
     private List<Element> elementList;
     private MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
     private FirebaseFirestore mFirestoreElement;
-    private String userID = "mENkJn3iyIQDIqSh3cRc";
-    //Date Category
-    private Calendar lastLogin = Calendar.getInstance();
-    private Calendar newLogin = Calendar.getInstance();
-
     //Filters GetData
     private MutableLiveData<Filter> filtersLiveData = new MutableLiveData<>();
-    //Random - sprawdzic czy mozna uzyc tej samej liveData?
     private MutableLiveData<Element> randomElementLiveData = new MutableLiveData<>();
     private List<Element> randomElementsList;
-    //Test with USerID
-    private MutableLiveData<String> userIDLiveData = new MutableLiveData<>();
 
     public FirebaseRepository() {
         mFirestoreElement = FirebaseFirestore.getInstance();
@@ -391,16 +382,20 @@ public class FirebaseRepository {
                 });
     }
 
-    public MutableLiveData<Element> getRandomElement(String selectedCategory, String selectedShare) {
+    public MutableLiveData<Element> getRandomElement(String userID, String selectedCategory, String selectedShare) {
         final CollectionReference reference = mFirestoreElement.collection("Users")
-                .document("osJ8vFzCZIVaSgwe8UGxjPftukh2")
+                .document(userID)
                 .collection("Lista");
         randomElementsList = new ArrayList<>();
-        //New
         com.google.firebase.firestore.Query noWatchedElementsQuery = reference
-                .whereEqualTo("isWatched", false)
-                .whereEqualTo("category", selectedCategory)
-                .whereEqualTo("share", selectedShare);
+                .whereEqualTo("isWatched", false);
+        //New
+        if (!selectedCategory.equals("Wszystko")) {
+            noWatchedElementsQuery = noWatchedElementsQuery.whereEqualTo("category", selectedCategory);
+        }
+        if (!selectedShare.equals("Wszystko")) {
+            noWatchedElementsQuery = noWatchedElementsQuery.whereEqualTo("share", selectedShare);
+        }
 
         noWatchedElementsQuery.get()
                 .addOnCompleteListener(task -> {
@@ -424,7 +419,7 @@ public class FirebaseRepository {
 
                 } catch (Exception e){
                         Element element = new Element();
-                        element.setTitle("No Elements");
+                        element.setTitle("Nie znaleziono");
                         randomElementLiveData.postValue(element);
                     }
                 });

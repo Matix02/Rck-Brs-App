@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import java.util.Objects;
+
 public class InfoActivity extends AppCompatActivity {
 
     @Override
@@ -14,12 +16,13 @@ public class InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-
         AppCompatButton facebookButton = findViewById(R.id.facebookButton);
         AppCompatButton youTubeButton = findViewById(R.id.youTubeButton);
         AppCompatButton spotifyButton = findViewById(R.id.spotifyButton);
         AppCompatButton linkedinButton = findViewById(R.id.linkedinButton);
         AppCompatButton gitHubButton = findViewById(R.id.gitHubButton);
+
+        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_back);
 
         facebookButton.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.pl"));

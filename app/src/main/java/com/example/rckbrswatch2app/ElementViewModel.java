@@ -31,7 +31,7 @@ public class ElementViewModel extends AndroidViewModel {
     public void deleteElement(String userID, String elementID) { firebaseRepository.deleteElement(userID, elementID);}
     public void editElement(String userID, Element element) { firebaseRepository.editElement(userID, element); }
 
-    public LiveData<Element> getRandomElement(String category, String share){ return firebaseRepository.getRandomElement(category, share); }
+    public LiveData<Element> getRandomElement(String userID, String category, String share){ return firebaseRepository.getRandomElement(userID, category, share); }
 
     public LiveData<Filter> getUserFilters(String userID){ return firebaseRepository.getUserFilter(userID); }
     public void setFilters(String userID, Filter filters) { firebaseRepository.setUserFilters(userID, filters); }

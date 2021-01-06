@@ -1,31 +1,27 @@
 package com.example.rckbrswatch2app;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.Transaction;
+
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -36,21 +32,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInClient mGoogleSingInClient;
     private ElementViewModel elementViewModel;
 
-    //sprawdzić
     protected String userID;
 
-    SharedPreferences sharedPreferences;
-
-    //Może pobawić się z Ponownym uwierzytelnienim użytkownika, bo wylogowuje i wlogowuje odrazu po tym, podpatrzeć w innyych aplikacjach, jeśli czas pozowli
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_login);
-
         elementViewModel = new ViewModelProvider(this).get(ElementViewModel.class);
 
-        Button singInButton = (Button) findViewById(R.id.login);
+        AppCompatButton singInButton =  findViewById(R.id.loginGoogle);
         singInButton.setOnClickListener(this);
 
         // Configure Google Sign In

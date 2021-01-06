@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -54,10 +55,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         elementViewModel.getUserFilters(userID).observe(this, filter ->
                 elementViewModel.readFirestore(userID, filter).observe(this , elementsList -> {
-            firebaseFilterList = new ArrayList<>();
-            firebaseFilterList.addAll(elementsList);
-            Log.d("Firebase", "Main firebase Elements size is " + firebaseFilterList.size());
-            adapter.setElementList(firebaseFilterList);
+                    findViewById(R.id.loadingElements).setVisibility(View.GONE);
+                    firebaseFilterList = new ArrayList<>();
+                    firebaseFilterList.addAll(elementsList);
+                    Log.d("Firebase", "Main firebase Elements size is " + firebaseFilterList.size());
+                    adapter.setElementList(firebaseFilterList);
         }));
 
         elementViewModel.getNewsCollection(userID);
@@ -123,22 +125,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case R.id.filter:
-                intent = new Intent(getApplicationContext(), FilterPopUpActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.settings:
-               intent = new Intent(MainActivity.this, RandomDialogActivity.class);
-               startActivity(intent);
-                return true;
-            case R.id.addF:
-                intent = new Intent(MainActivity.this, InfoActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.deleteRoom:
+            case R.id.filterPage:
                 intent = new Intent(MainActivity.this, FiltersDialogActivity.class);
                 intent.putExtra("userID", userID);
-                Log.d("LoginID", "userID to the filters" + userID);
+                startActivity(intent);
+                return true;
+            case R.id.randomElementPage:
+               intent = new Intent(MainActivity.this, RandomDialogActivity.class);
+                intent.putExtra("userID", userID);
+               startActivity(intent);
+                return true;
+            case R.id.infoPage:
+                intent = new Intent(MainActivity.this, InfoActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.signOut:
@@ -184,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             Element element = new Element(id, title, category, isWatched, share);
             elementViewModel.editElement(userID, element);
         } else {
-            Toast.makeText(this, "Nie udało się dodać Elementu", Toast.LENGTH_LONG).show();
+            Log.d("AddEditActivity", "Nie udało się dodać Elementu");
         }
     }
 }

@@ -110,4 +110,25 @@ public class EditElementActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    //Alternatywne rozwiązanie do tego, ze względu na ciągle zmieniające się indexy
+    private int getIndex(String item){
+        int index = 0;
+        switch (item) {
+            case "Film":
+                index = 2131230862;
+                break;
+            case "Serial":
+                index = 2131230728;
+                break;
+            case "Książka":
+                index = 2131230887;
+                break;
+            case "Gra":
+                index = 2131230870;
+                break;
+        }
+        return  index;
+    }
+
+
 }

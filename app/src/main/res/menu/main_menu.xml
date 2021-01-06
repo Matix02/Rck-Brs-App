@@ -10,28 +10,24 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         />
     <item
-        android:id="@+id/filter"
-        android:title="Update List"
+        android:id="@+id/filterPage"
+        android:title="Filtracja"
         app:showAsAction="never"
         />
     <item
-        android:id="@+id/settings"
-        android:title="Show Games"
+        android:id="@+id/randomElementPage"
+        android:title="Losowanie"
         app:showAsAction="never"
         />
     <item
-        android:id="@+id/addF"
-        android:title="Add Firebase"
+        android:id="@+id/infoPage"
+        android:title="Informacje"
         app:showAsAction="never"
         />
-    <item
-        android:id="@+id/deleteRoom"
-        android:title="Delete All Room"
-        app:showAsAction="never"
-        />
+
     <item
         android:id="@+id/signOut"
-        android:title="Sign Out"
+        android:title="Wyloguj"
         app:showAsAction="never"
         />
 </menu>
