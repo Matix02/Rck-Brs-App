@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.Delete;
 
 import android.app.Application;
 import android.util.Log;
@@ -6,6 +6,8 @@ import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.rckbrswatch2app.Delete.ElementDao;
+import com.example.rckbrswatch2app.Delete.ElementDatabase;
 import com.example.rckbrswatch2app.Model.Element;
 
 import java.util.ArrayList;

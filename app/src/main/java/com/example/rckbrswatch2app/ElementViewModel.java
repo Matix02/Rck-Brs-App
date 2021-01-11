@@ -39,4 +39,7 @@ public class ElementViewModel extends AndroidViewModel {
 
     public LiveData<Filter> getUserFilters(String userID){ return firebaseRepository.getUserFilter(userID); }
     public void setFilters(String userID, Filter filters) { firebaseRepository.setUserFilters(userID, filters); }
+
+
+    public void checkUserState() { firebaseRepository.isUserRegistered("awdawd");}
 }

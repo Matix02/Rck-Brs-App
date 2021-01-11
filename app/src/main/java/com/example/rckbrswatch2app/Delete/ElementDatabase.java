@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.Delete;
 
 import android.content.Context;
 import android.util.Log;

@@ -85,7 +85,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         User user = new User(userID, displayName, email);
 
         //Zmienić nazwę funkcji
-        elementViewModel.registerUserOutside(user);
+       // elementViewModel.registerUserOutside(user);
+        elementViewModel.checkUserState();
     }
 
     @Override
@@ -99,7 +100,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 try {
                     GoogleSignInAccount account = task.getResult(ApiException.class);
                     assert account != null;
-                    Log.d("GoogleLogin", "firebaseLogin:  " + account.getId());
                     firebaseAuthWithGoogle(account.getIdToken());
                 } catch (ApiException e) {
                     e.printStackTrace();
@@ -117,8 +117,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     if (task.isSuccessful()) {
                         Log.d("GoogleLogin", "GoogleLogin Successfully");
                         FirebaseUser user = mAuth.getCurrentUser();
-                        //Funkcja spajaąca
+                        //Funkcja spajająca
                         assert user != null;
+
+
                         createUserProfile(user.getUid(), user.getDisplayName(), user.getEmail());
 
                         Intent intent = new Intent(this, MainActivity.class);

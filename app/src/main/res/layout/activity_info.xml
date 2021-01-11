@@ -6,7 +6,18 @@
     android:layout_height="match_parent"
     android:padding="12sp"
     tools:context=".InfoActivity">
-
+   <!-- Ogarnac mniejsze ekrany <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+             android:orientation="vertical">
+ -->
     <androidx.appcompat.widget.AppCompatTextView
     android:id="@+id/socialTitlePage"
     android:layout_width="match_parent"
@@ -179,4 +190,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />
+       <!-- </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView> -->
 </androidx.constraintlayout.widget.ConstraintLayout>

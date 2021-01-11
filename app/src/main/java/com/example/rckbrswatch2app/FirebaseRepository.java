@@ -88,10 +88,19 @@ public class FirebaseRepository {
         DocumentReference reference = mFirestoreElement.collection("Users").document(newUserID);
         CollectionReference elementsCollectionReference = mFirestoreElement.collection("Elements");
 
+        Task<DocumentSnapshot> g = reference.get();
+
+
+      //  boolean holyCheck = isUserRegistered(newUserID);
+
         Task<Void> referenceTask = reference.set(userData);
+
+
+
         referenceTask.addOnSuccessListener(documentReference -> elementsCollectionReference
                 .get()
                 .addOnCompleteListener(task -> {
+
                     if (task.isSuccessful()){
                         CollectionReference userCollectionReference = reference.collection("Lista");
                         for(QueryDocumentSnapshot d: Objects.requireNonNull(task.getResult())){
@@ -107,6 +116,33 @@ public class FirebaseRepository {
                     }
                 }))
                 .addOnFailureListener(e -> Log.d("RegisterOutsideUser", "Nie udało się dodać Użytkownika " + e.getMessage()));
+        }
+
+    public void isUserRegistered(String userID) {
+
+        boolean isUserExists = false;
+        DocumentReference userDocumentReference =  mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2");
+        //Task<DocumentSnapshot> g = userDocumentReference.get();
+
+        userDocumentReference.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                Log.d("LoginActivity", "Successfull if is successful "  );
+                DocumentSnapshot documentSnapshot = task.getResult();
+                assert documentSnapshot != null;
+                if (documentSnapshot.exists())
+                    Log.d("Register", "document exists");
+                else
+                    Log.d("Register", "document NO exists");
+
+            } else
+                Log.d("Register", "task NO successful ");
+
+        }).addOnFailureListener(e -> {
+            Log.d("Register", "Completely bad ");
+
+        });
+
+
     }
 
     public void addNewElement(Element element){
@@ -121,7 +157,7 @@ public class FirebaseRepository {
         elementData.put("title", element.getTitle());
         elementData.put("category", element.getCategory());
         elementData.put("share", element.getShare());
-        elementData.put("isWatched", element.isWatched());
+        //elementData.put("isWatched", element.isWatched());
 
         Map<String, Object> newsElementData = new HashMap<>(elementData);
         newsElementData.put("state", "New");

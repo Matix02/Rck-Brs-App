@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.Delete;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
