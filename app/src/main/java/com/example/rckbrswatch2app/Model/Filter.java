@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.Model;
 
 public class Filter {
     //MainFilter

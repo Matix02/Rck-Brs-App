@@ -50,7 +50,11 @@ public class EditElementActivity extends AppCompatActivity {
         if (intent.hasExtra(EXTRA_RESULT_NUMBER)) {
             setTitle("Edytuj Element");
             editTextTitle.setText(intent.getStringExtra(EXTRA_TITLE));
-            //Uzupełnić RadioButtony x2
+            int radioCategoryID = getCategoryIndex(Objects.requireNonNull(intent.getStringExtra(EXTRA_CATEGORY)));
+            categoryRadioGroup.check(radioCategoryID);
+
+            int radioShareID = getShareIndex(Objects.requireNonNull(intent.getStringExtra(EXTRA_SHARE)));
+            shareRadioGroup.check(radioShareID);
 
         } else {
             setTitle("Dodaj Element");
@@ -111,20 +115,38 @@ public class EditElementActivity extends AppCompatActivity {
         }
     }
     //Alternatywne rozwiązanie do tego, ze względu na ciągle zmieniające się indexy
-    private int getIndex(String item){
+    private int getCategoryIndex(String item){
         int index = 0;
         switch (item) {
             case "Film":
-                index = 2131230862;
+                index = 2131231022;
                 break;
             case "Serial":
-                index = 2131230728;
+                index = 2131231027;
                 break;
             case "Książka":
-                index = 2131230887;
+                index = 2131231020;
                 break;
             case "Gra":
-                index = 2131230870;
+                index = 2131231023;
+                break;
+        }
+        return  index;
+    }
+    private int getShareIndex(String item){
+        int index = 0;
+        switch (item) {
+            case "Rock":
+                index = 2131231026;
+                break;
+            case "Borys":
+                index = 2131231021;
+                break;
+            case "RcknBrs":
+                index = 2131231025;
+                break;
+            case "Inne":
+                index = 2131231024;
                 break;
         }
         return  index;

@@ -4,6 +4,9 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.rckbrswatch2app.Model.Element;
+import com.example.rckbrswatch2app.Model.Filter;
+import com.example.rckbrswatch2app.Model.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;

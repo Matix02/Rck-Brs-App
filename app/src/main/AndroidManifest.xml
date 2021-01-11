@@ -9,21 +9,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".InfoActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".EditElementActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".RandomDialogActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity
-            android:name=".FiltersDialogActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".InfoActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".EditElementActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".RandomDialogActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".FiltersDialogActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".LoginActivity">
+
         </activity>
         <activity
             android:name=".MainActivity"

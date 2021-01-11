@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.Model;
 
 public class Element {
 
@@ -9,7 +9,7 @@ public class Element {
     public boolean isWatched;
     private String state;
 
-    Element() {}
+    public Element() {}
     public Element(boolean isWatched, String share, String title, String category) {
         this.title = title;
         this.category = category;

@@ -4,62 +4,179 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="12sp"
     tools:context=".InfoActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
-    android:id="@+id/facebookTV"
+    android:id="@+id/socialTitlePage"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textSize="24sp"
     android:gravity="center"
-    android:text="FacebbokGroupLink:"
+    android:text="Social Page"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/facebookButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Click My Facebook"
-        app:layout_constraintTop_toBottomOf="@id/facebookTV"
-        />
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/youTubeButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Click My YouTube"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_facebook_blue"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/facebookButton"
+        app:layout_constraintTop_toBottomOf="@id/socialTitlePage"
+        android:layout_marginTop="10sp"
         />
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/spotifyButton"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/facebookTV"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Click My Spotify"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="Official RB Group Facebook"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/facebookButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/youTubeButton"
-        />
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/linkedinButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Click My Linkedin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spotifyButton"
-        />
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/gitHubButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Click My GitHub"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linkedinButton"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/socialTitlePage"
         />
 
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/youTubeButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_youtube"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/facebookButton"
+        android:layout_marginTop="10sp"
+
+
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/youTubeTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="YouTube Channel to Watch"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/youTubeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/facebookButton"
+        />
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/spotifyButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_spotify"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/youTubeButton"
+        android:layout_marginTop="10sp"
+
+
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/spotifyTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Official Podcast Channel"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/spotifyButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/youTubeButton"
+        />
+    <!-- Author -->
+    <View
+        android:id="@+id/lineView"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="15sp"
+        android:background="#c0c0c0"
+
+        app:layout_constraintTop_toBottomOf="@id/spotifyButton"
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/authorTitleTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Author Info"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:layout_marginTop="10sp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/lineView"
+        />
+    <!-- Linkdin -->
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/linkedinButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_linkedin"
+        android:scaleType="fitXY"
+        android:layout_marginTop="5sp"
+
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/authorTitleTV"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/linkedinTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Linkedln Profile"
+        android:textSize="18sp"
+        android:layout_marginTop="10sp"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linkedinButton"
+        />
+    <!-- GitHub -->
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/githubButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_github"
+        android:scaleType="fitXY"
+        android:layout_marginTop="5sp"
+
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/authorTitleTV"
+
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/gitHubTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GitHub Profile"
+        android:layout_marginTop="10sp"
+
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/githubButton"
+
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/copyrightTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/copyright"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

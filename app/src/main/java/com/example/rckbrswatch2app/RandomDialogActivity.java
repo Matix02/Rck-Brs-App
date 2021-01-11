@@ -75,11 +75,11 @@ public class RandomDialogActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.reset_filter) {
-            int defaultShareSwtichID = 2131230799;
-            int defaultCategorySwtichID = 2131230798;
+            int defaultShareSwitchID = 2131230800;
+            int defaultCategorySwitchID = 2131230799;
 
-            radioCategoryGroup.check(defaultCategorySwtichID);
-            radioShareGroup.check(defaultShareSwtichID);
+            radioCategoryGroup.check(defaultCategorySwitchID);
+            radioShareGroup.check(defaultShareSwitchID);
             resultTextView.setText("");
             return true;
         }

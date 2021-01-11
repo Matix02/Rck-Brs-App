@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rckbrswatch2app.Model.Element;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

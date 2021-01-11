@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.example.rckbrswatch2app.Model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -81,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void createUserProfile(String userID, String displayName, String email){
-        com.example.rckbrswatch2app.User user = new User(userID, displayName, email);
+        User user = new User(userID, displayName, email);
 
         //Zmienić nazwę funkcji
         elementViewModel.registerUserOutside(user);

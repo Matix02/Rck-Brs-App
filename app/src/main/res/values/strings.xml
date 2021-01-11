@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Rck&amp;BrsWatch2App</string>
+   <!-- <string name="app_name">Rck&amp;BrsWatch2App</string>-->
+    <string name="app_name">WatchApp</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -43,4 +44,6 @@
     <string name="spersonalizuj_list">Spersonalizuj Listę</string>
     <string name="poni_sze_opcje_pozwol_ci_dopasowa_list_do_w_asnych_potrzeb">Poniższe opcje pozwolą Ci dopasować listę do własnych potrzeb</string>
     <string name="random_title">Random Title</string>
+    <string name="copyright">Watch App &#169; M.G</string>
+
 </resources>

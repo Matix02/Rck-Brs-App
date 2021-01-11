@@ -6,6 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.example.rckbrswatch2app.Model.Element;
+import com.example.rckbrswatch2app.Model.Filter;
+import com.example.rckbrswatch2app.Model.User;
+
 import java.util.List;
 
 public class ElementViewModel extends AndroidViewModel {

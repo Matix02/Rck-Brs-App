@@ -6,6 +6,8 @@ import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.rckbrswatch2app.Model.Element;
+
 import java.util.ArrayList;
 import java.util.List;
 

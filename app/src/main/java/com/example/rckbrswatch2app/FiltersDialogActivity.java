@@ -16,6 +16,8 @@ import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.rckbrswatch2app.Model.Filter;
+
 import java.util.Objects;
 
 public class FiltersDialogActivity extends AppCompatActivity{
