@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "809175734471",
+    "firebase_url": "https://rckbrswatch2app.firebaseio.com",
+    "project_id": "rckbrswatch2app",
+    "storage_bucket": "rckbrswatch2app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809175734471:android:038b8a700f27e5a12306e2",
+        "android_client_info": {
+          "package_name": "com.example.rckbrswatch2app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "809175734471-462jti4ddbnvr0pnhvcd8tlog1q3o1p1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rckbrswatch2app",
+            "certificate_hash": "d1e5d67c0e44ad366a2968c752cfc4bdfce01954"
+          }
+        },
+        {
+          "client_id": "809175734471-06gh54i2gocpuk5iqktnnkkcb0d87olv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1CE-j2e698_XJt6GwiKYv6xoloN8FBak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "809175734471-06gh54i2gocpuk5iqktnnkkcb0d87olv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

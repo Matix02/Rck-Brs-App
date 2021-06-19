@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.Repository;
 
 import android.util.Log;
 
@@ -27,11 +27,11 @@ import java.util.stream.Collectors;
 
 public class FirebaseRepository {
     private List<Element> elementList;
-    private MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
-    private FirebaseFirestore mFirestoreElement;
+    private final MutableLiveData<List<Element>> elementLiveData = new MutableLiveData<>();
+    private final FirebaseFirestore mFirestoreElement;
     //Filters GetData
-    private MutableLiveData<Filter> filtersLiveData = new MutableLiveData<>();
-    private MutableLiveData<Element> randomElementLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Filter> filtersLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Element> randomElementLiveData = new MutableLiveData<>();
     private List<Element> randomElementsList;
 
     public FirebaseRepository() {
@@ -43,7 +43,7 @@ public class FirebaseRepository {
         mFirestoreElement.collection("Users").document(userID).collection("Lista")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
-                        Log.d("ReadFirebase", "ObserveElement has lost a mind" + error);
+                        Log.d("ReadFirebase", "ObserveElement has lost his mind" + error);
                         return;
                     }
                     elementList = new ArrayList<>();
@@ -88,14 +88,7 @@ public class FirebaseRepository {
         DocumentReference reference = mFirestoreElement.collection("Users").document(newUserID);
         CollectionReference elementsCollectionReference = mFirestoreElement.collection("Elements");
 
-        Task<DocumentSnapshot> g = reference.get();
-
-
-      //  boolean holyCheck = isUserRegistered(newUserID);
-
         Task<Void> referenceTask = reference.set(userData);
-
-
 
         referenceTask.addOnSuccessListener(documentReference -> elementsCollectionReference
                 .get()
@@ -120,29 +113,16 @@ public class FirebaseRepository {
 
     public void isUserRegistered(String userID) {
 
-        boolean isUserExists = false;
         DocumentReference userDocumentReference =  mFirestoreElement.collection("Users").document("osJ8vFzCZIVaSgwe8UGxjPftukh2");
-        //Task<DocumentSnapshot> g = userDocumentReference.get();
 
-        userDocumentReference.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()){
+        userDocumentReference.get().addOnSuccessListener(task -> {
                 Log.d("LoginActivity", "Successfull if is successful "  );
-                DocumentSnapshot documentSnapshot = task.getResult();
-                assert documentSnapshot != null;
-                if (documentSnapshot.exists())
+                if (task.exists())
                     Log.d("Register", "document exists");
                 else
                     Log.d("Register", "document NO exists");
 
-            } else
-                Log.d("Register", "task NO successful ");
-
-        }).addOnFailureListener(e -> {
-            Log.d("Register", "Completely bad ");
-
-        });
-
-
+        }).addOnFailureListener(e -> Log.d("Register", "Completely bad "));
     }
 
     public void addNewElement(Element element){
@@ -188,7 +168,6 @@ public class FirebaseRepository {
         });
     }
 
-
     public void setTimeLogin(String userID){
         //Aktualizuje podane dane, wraz z możliwością dostoswania ilości pól, i akutalizacji daty na tą aktualną w normalnym formacie
         final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(userID);
@@ -208,6 +187,7 @@ public class FirebaseRepository {
                 })
                 .addOnFailureListener(error -> Log.d("Firestore", "Transaction failed because of " + error));
     }
+
     public void updateList(String currentUserID, String typeTimeLogin) {
 
         final DocumentReference userLogRef = mFirestoreElement.collection("Users").document(currentUserID);
@@ -234,9 +214,7 @@ public class FirebaseRepository {
                     });
             return null;
         })
-                .addOnSuccessListener(command -> {
-                    Log.d("Firestore", "TransactionList success");
-                })
+                .addOnSuccessListener(command -> Log.d("Firestore", "TransactionList success"))
                 .addOnFailureListener(error -> Log.d("Firestore", "Transaction failed because of " + error));
     }
 
@@ -257,23 +235,15 @@ public class FirebaseRepository {
                     }
                     transaction.set(userListDocRef, element);
                     return null;
-                }).addOnSuccessListener(success -> {
-                    Log.d("Firestore", "TransactionADD success");
-                })
-                        .addOnFailureListener(error -> {
-                            Log.d("Firestore", "TransactionADD failed = " + error);
-                        });
+                }).addOnSuccessListener(success -> Log.d("Firestore", "TransactionADD success"))
+                        .addOnFailureListener(error -> Log.d("Firestore", "TransactionADD failed = " + error));
                 break;
             case "Delete":
                 mFirestoreElement.runTransaction(transaction -> {
                     transaction.delete(userListDocRef);
                     return null;
-                }).addOnSuccessListener(success -> {
-                    Log.d("Firestore", "TransactionDELETE success");
-                })
-                        .addOnFailureListener(error -> {
-                            Log.d("Firestore", "TransactionDELETE failed = " + error);
-                        });
+                }).addOnSuccessListener(success -> Log.d("Firestore", "TransactionDELETE success"))
+                        .addOnFailureListener(error -> Log.d("Firestore", "TransactionDELETE failed = " + error));
                 break;
             case "Update":
                 mFirestoreElement.runTransaction(transaction -> {
@@ -289,12 +259,8 @@ public class FirebaseRepository {
                     }
 
                     return null;
-                }).addOnSuccessListener(success -> {
-                    Log.d("Firestore", "TransactionUPDATE success");
-                })
-                        .addOnFailureListener(error -> {
-                            Log.d("Firestore", "TransactionUPDATE failed = " + error);
-                        });
+                }).addOnSuccessListener(success -> Log.d("Firestore", "TransactionUPDATE success"))
+                        .addOnFailureListener(error -> Log.d("Firestore", "TransactionUPDATE failed = " + error));
                 break;
         }
     }
@@ -305,12 +271,8 @@ public class FirebaseRepository {
         boolean newIsWatchedElement = element.isWatched;
 
         listRef.update("isWatched", newIsWatchedElement)
-                .addOnSuccessListener(command -> {
-                    Log.d("Firestore", "UpdateIsWatched success");
-                })
-                .addOnFailureListener(error -> {
-                    Log.d("Firestore", "UpdateIsWatched failed because of " + error);
-                });
+                .addOnSuccessListener(command -> Log.d("Firestore", "UpdateIsWatched success"))
+                .addOnFailureListener(error -> Log.d("Firestore", "UpdateIsWatched failed because of " + error));
     }
 
     public void deleteElement(String userID, String elementId){
@@ -349,12 +311,8 @@ public class FirebaseRepository {
 
             return null;
         })
-                .addOnSuccessListener(command -> {
-                    Log.d("Firestore", "AdminTransactionDelete success");
-                })
-                .addOnFailureListener(error -> {
-                    Log.d("Firestore", "AdminTransactionDelete failed because of " + error);
-                });
+                .addOnSuccessListener(command -> Log.d("Firestore", "AdminTransactionDelete success"))
+                .addOnFailureListener(error -> Log.d("Firestore", "AdminTransactionDelete failed because of " + error));
     }
 
     public void editElement(String userID, Element element){
@@ -389,12 +347,8 @@ public class FirebaseRepository {
             transaction.set(newsRef, editElement);
             return null;
         })
-                .addOnSuccessListener(command -> {
-                    Log.d("Firestore", "AdminTransactionDelete success");
-                })
-                .addOnFailureListener(error -> {
-                    Log.d("Firestore", "AdminTransactionDelete failed because of " + error);
-                });
+                .addOnSuccessListener(command -> Log.d("Firestore", "AdminTransactionDelete success"))
+                .addOnFailureListener(error -> Log.d("Firestore", "AdminTransactionDelete failed because of " + error));
     }
 
     public void registerInsideUser(String name, String email, String password){
@@ -416,9 +370,7 @@ public class FirebaseRepository {
             return null;
         })
                 .addOnSuccessListener(command -> Log.d("Firestore", "Registration successfully"))
-                .addOnFailureListener(error -> {
-                    Log.d("Firestore", "Registration failed because of " + error);
-                });
+                .addOnFailureListener(error -> Log.d("Firestore", "Registration failed because of " + error));
     }
 
     public MutableLiveData<Element> getRandomElement(String userID, String selectedCategory, String selectedShare) {
@@ -541,7 +493,6 @@ public class FirebaseRepository {
         }
         return completePromList;
     }
-
     /* !!! Koniec Filtracji !!! */
 
     //*************Filtracja pobór****************
@@ -589,12 +540,7 @@ public class FirebaseRepository {
         userDataFilters.put("isShareOther", filters.isShareOther());
 
         listRef.update(userDataFilters)
-                .addOnSuccessListener(success -> {
-                    Log.d("FilterSet", "FilterSet success");
-
-                })
-                .addOnFailureListener(error -> {
-                    Log.d("FilterSet", "FilterSet failed " + error);
-                });
+                .addOnSuccessListener(success -> Log.d("FilterSet", "FilterSet success"))
+                .addOnFailureListener(error -> Log.d("FilterSet", "FilterSet failed " + error));
     }
 }

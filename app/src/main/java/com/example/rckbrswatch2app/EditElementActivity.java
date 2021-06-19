@@ -29,10 +29,7 @@ public class EditElementActivity extends AppCompatActivity {
 
     private AppCompatEditText editTextTitle;
     private RadioGroup categoryRadioGroup;
-    private AppCompatRadioButton categoryRadioButton;
     private RadioGroup shareRadioGroup;
-    private AppCompatRadioButton shareRadioButton;
-    private AppCompatButton saveEditsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +39,7 @@ public class EditElementActivity extends AppCompatActivity {
         editTextTitle = findViewById(R.id.editTitleText);
         categoryRadioGroup = findViewById(R.id.kategorieEditRadioG);
         shareRadioGroup = findViewById(R.id.shareEditRadioG);
-        saveEditsButton = findViewById(R.id.saveEditBT);
+        AppCompatButton saveEditsButton = findViewById(R.id.saveEditBT);
 
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         Intent intent = getIntent();
@@ -61,7 +58,6 @@ public class EditElementActivity extends AppCompatActivity {
         }
 
         saveEditsButton.setOnClickListener(v -> {
-
             saveElement();
         });
 
@@ -70,10 +66,10 @@ public class EditElementActivity extends AppCompatActivity {
         try {
             String title = Objects.requireNonNull(editTextTitle.getText()).toString();
             int radioCategoryId = categoryRadioGroup.getCheckedRadioButtonId();
-            categoryRadioButton = findViewById(radioCategoryId);
+            AppCompatRadioButton categoryRadioButton = findViewById(radioCategoryId);
             String categoryName = categoryRadioButton.getText().toString();
             int radioShareId = shareRadioGroup.getCheckedRadioButtonId();
-            shareRadioButton = findViewById(radioShareId);
+            AppCompatRadioButton shareRadioButton = findViewById(radioShareId);
             String shareName = shareRadioButton.getText().toString();
 
             Intent data = new Intent();
@@ -84,6 +80,7 @@ public class EditElementActivity extends AppCompatActivity {
             Log.d("ResultNumber", "" + getIntent().getStringExtra(EXTRA_RESULT_NUMBER));
             String id = getIntent().getStringExtra(EXTRA_ID);
             boolean isWatched = getIntent().getBooleanExtra(EXTRA_IS_WATCHED, false);
+
             if (id != null) {
                 data.putExtra(EXTRA_ID, id);
                 data.putExtra(EXTRA_IS_WATCHED, isWatched);

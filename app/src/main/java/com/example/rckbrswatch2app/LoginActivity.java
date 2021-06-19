@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.rckbrswatch2app.Model.User;
+import com.example.rckbrswatch2app.ViewModel.ElementViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -85,8 +86,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         User user = new User(userID, displayName, email);
 
         //Zmienić nazwę funkcji
-       // elementViewModel.registerUserOutside(user);
-        elementViewModel.checkUserState();
+       elementViewModel.registerUserOutside(user);
     }
 
     @Override

@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioGroup;
 
+import com.example.rckbrswatch2app.ViewModel.ElementViewModel;
+
 import java.util.Objects;
 
 public class RandomDialogActivity extends AppCompatActivity {

@@ -18,7 +18,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rckbrswatch2app.Adapter.ElementAdapter;
 import com.example.rckbrswatch2app.Model.Element;
+import com.example.rckbrswatch2app.ViewModel.ElementViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -29,11 +31,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public static final int ADD_ELEMENT_REQUEST = 1;
     public static final int EDIT_ELEMENT_REQUEST = 2;
 
-    ElementViewModel elementViewModel;
+    public ElementViewModel elementViewModel;
 
     ElementAdapter adapter;
     List<Element> firebaseFilterList;
-    String userID;
+    public String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         userID = intent.getStringExtra("userID");
         Log.d("UserID", "is " + userID);
 
+        elementViewModel.setActiveUserLogin(userID);
+        elementViewModel.getNewsCollection(userID);
+
         elementViewModel.getUserFilters(userID).observe(this, filter ->
                 elementViewModel.readFirestore(userID, filter).observe(this , elementsList -> {
                     findViewById(R.id.loadingElements).setVisibility(View.GONE);
@@ -63,9 +68,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     adapter.setElementList(firebaseFilterList);
         }));
 
-        elementViewModel.getNewsCollection(userID);
-        //Zapisuej dane logowania daty
-        elementViewModel.setActiveUserLogin(userID);
+
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -76,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 String selectedElementID = adapter.getElementAt(viewHolder.getAdapterPosition()).getId();
                 elementViewModel.deleteElement(userID, selectedElementID);
-               // adapter.notifyDataSetChanged();
                 Log.d("DeleteTransaction", "MainActivity Delete elementID arg -> " + selectedElementID);
                 Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_LONG).show();
             }

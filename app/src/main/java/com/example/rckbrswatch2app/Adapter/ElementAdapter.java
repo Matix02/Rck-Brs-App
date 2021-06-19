@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rckbrswatch2app.MainActivity;
 import com.example.rckbrswatch2app.Model.Element;
+import com.example.rckbrswatch2app.R;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,10 +96,10 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementH
 
     class ElementHolder extends RecyclerView.ViewHolder {
 
-        private TextView textViewTitle;
-        private TextView textViewCategory;
-        private CheckBox checkBoxWatch;
-        private TextView textViewShare;
+        private final TextView textViewTitle;
+        private final TextView textViewCategory;
+        private final CheckBox checkBoxWatch;
+        private final TextView textViewShare;
 
         public ElementHolder(@NonNull View itemView) {
             super(itemView);

@@ -17,6 +17,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.rckbrswatch2app.Model.Filter;
+import com.example.rckbrswatch2app.ViewModel.ElementViewModel;
 
 import java.util.Objects;
 

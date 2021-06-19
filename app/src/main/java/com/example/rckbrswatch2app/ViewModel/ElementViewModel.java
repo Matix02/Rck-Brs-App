@@ -1,4 +1,4 @@
-package com.example.rckbrswatch2app;
+package com.example.rckbrswatch2app.ViewModel;
 
 import android.app.Application;
 
@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.example.rckbrswatch2app.Repository.FirebaseRepository;
 import com.example.rckbrswatch2app.Model.Element;
 import com.example.rckbrswatch2app.Model.Filter;
 import com.example.rckbrswatch2app.Model.User;
